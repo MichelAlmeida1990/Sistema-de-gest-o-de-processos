@@ -180,7 +180,7 @@ def get_database_url() -> str:
     env_url = os.getenv("DATABASE_URL")
     if env_url:
         return env_url
-    return settings.database_url
+    return settings.DATABASE_URL
 
 def get_redis_url() -> str:
     """Obter URL do Redis baseada no ambiente."""
