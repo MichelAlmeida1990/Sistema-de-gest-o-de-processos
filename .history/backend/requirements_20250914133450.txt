@@ -1,0 +1,74 @@
+# ===========================================
+# DEPENDÊNCIAS DO BACKEND (FASTAPI)
+# ===========================================
+
+# Framework Web
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Banco de Dados
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.9
+
+# Cache
+redis==5.0.1
+hiredis==2.2.3
+
+# Autenticação e Segurança
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+cryptography>=41.0.0
+
+# 2FA
+pyotp==2.9.0
+qrcode[pil]==7.4.2
+
+# Validação e Serialização
+pydantic==2.5.0
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# HTTP Client
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Upload de Arquivos
+python-multipart==0.0.6
+aiofiles==23.2.1
+
+# Logging e Monitoramento
+structlog==23.2.0
+sentry-sdk[fastapi]==1.38.0
+
+# Utilitários
+python-dateutil==2.8.2
+pytz==2023.3
+click==8.1.7
+
+# Testes
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2
+
+# Desenvolvimento
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Rate Limiting
+slowapi==0.1.9
+
+# Background Tasks
+celery==5.3.4
+kombu==5.3.4
+
+# Email
+fastapi-mail==1.4.1
+
+# Backup
+schedule==1.2.0
+

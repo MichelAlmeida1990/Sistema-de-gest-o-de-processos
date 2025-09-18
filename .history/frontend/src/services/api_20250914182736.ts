@@ -1,0 +1,124 @@
+// ===========================================
+// CONFIGURAÇÃO DA API
+// ===========================================
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+
+export interface ApiResponse<T> {
+  data?: T
+  message?: string
+  error?: string
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  total: number
+  page: number
+  per_page: number
+}
+
+// ===========================================
+// CONFIGURAÇÃO DO AXIOS
+// ===========================================
+
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+
+class ApiService {
+  private api: AxiosInstance
+  private token: string | null = null
+
+  constructor() {
+    this.api = axios.create({
+      baseURL: API_BASE_URL,
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    // Interceptor para adicionar token automaticamente
+    this.api.interceptors.request.use(
+      (config) => {
+        if (this.token) {
+          config.headers.Authorization = `Bearer ${this.token}`
+        }
+        return config
+      },
+      (error) => {
+        return Promise.reject(error)
+      }
+    )
+
+    // Interceptor para tratar respostas
+    this.api.interceptors.response.use(
+      (response: AxiosResponse) => {
+        return response
+      },
+      (error) => {
+        if (error.response?.status === 401) {
+          // Token expirado ou inválido
+          this.clearToken()
+          window.location.href = '/login'
+        }
+        return Promise.reject(error)
+      }
+    )
+
+    // Carregar token do localStorage
+    this.loadToken()
+  }
+
+  private loadToken(): void {
+    this.token = localStorage.getItem('auth_token')
+  }
+
+  public setToken(token: string): void {
+    this.token = token
+    localStorage.setItem('auth_token', token)
+  }
+
+  public clearToken(): void {
+    this.token = null
+    localStorage.removeItem('auth_token')
+  }
+
+  public getToken(): string | null {
+    return this.token
+  }
+
+  // ===========================================
+  // MÉTODOS HTTP
+  // ===========================================
+
+  public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.api.get<T>(url, config)
+    return response.data
+  }
+
+  public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.api.post<T>(url, data, config)
+    return response.data
+  }
+
+  public async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.api.put<T>(url, data, config)
+    return response.data
+  }
+
+  public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.api.delete<T>(url, config)
+    return response.data
+  }
+
+  public async upload<T>(url: string, formData: FormData): Promise<T> {
+    const response = await this.api.post<T>(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return response.data
+  }
+}
+
+export const apiService = new ApiService()
+export default apiService

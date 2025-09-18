@@ -1,0 +1,351 @@
+import { create } from 'zustand'
+
+export interface Notification {
+  id: string
+  type: 'success' | 'warning' | 'error' | 'info'
+  title: string
+  message: string
+  timestamp: string
+  read: boolean
+  priority: 'low' | 'medium' | 'high'
+  category: 'task' | 'process' | 'system' | 'deadline' | 'payment'
+  actionUrl?: string
+  metadata?: Record<string, any>
+}
+
+interface NotificationStore {
+  notifications: Notification[]
+  get unreadCount(): number
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void
+  markAsRead: (id: string) => void
+  markAllAsRead: () => void
+  removeNotification: (id: string) => void
+  clearAllNotifications: () => void
+  getNotificationsByCategory: (category: string) => Notification[]
+  getUnreadNotifications: () => Notification[]
+}
+
+export const useNotificationStore = create<NotificationStore>((set, get) => ({
+  notifications: [
+    // Notificações iniciais mockadas com melhor formatação
+    {
+      id: '1',
+      type: 'warning',
+      title: 'Prazo Próximo',
+      message: 'A tarefa "Cálculo de Verbas Rescisórias" vence em 2 dias. Priorize esta atividade para evitar atrasos.',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 horas atrás
+      read: false,
+      priority: 'high',
+      category: 'deadline',
+      actionUrl: '/tasks',
+      metadata: {
+        taskId: '1',
+        dueDate: '2024-01-22',
+        processNumber: '1001234-56.2024.8.26.0001'
+      }
+    },
+    {
+      id: '2',
+      type: 'info',
+      title: 'Nova Tarefa Atribuída',
+      message: 'João Silva atribuiu a tarefa "Análise de Documentos" para você. Prazo: 15 dias.',
+      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 horas atrás
+      read: false,
+      priority: 'medium',
+      category: 'task',
+      actionUrl: '/tasks',
+      metadata: {
+        taskId: '2',
+        assignee: 'João Silva',
+        processNumber: '2001234-56.2024.8.26.0002'
+      }
+    },
+    {
+      id: '3',
+      type: 'success',
+      title: 'Processo Atualizado',
+      message: 'O processo "Ação Trabalhista - Rescisão" foi movido para status "Em Andamento".',
+      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 horas atrás
+      read: true,
+      priority: 'medium',
+      category: 'process',
+      actionUrl: '/processes',
+      metadata: {
+        processId: '1',
+        oldStatus: 'Pendente',
+        newStatus: 'Em Andamento'
+      }
+    },
+    {
+      id: '4',
+      type: 'error',
+      title: 'Pagamento Atrasado',
+      message: 'O pagamento para Carlos Lima (R$ 1.500,00) está atrasado há 5 dias. Ação urgente necessária.',
+      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 dia atrás
+      read: false,
+      priority: 'high',
+      category: 'payment',
+      actionUrl: '/financial',
+      metadata: {
+        partnerId: '1',
+        partnerName: 'Carlos Lima',
+        dueDate: '2024-01-12',
+        amount: 1500.00
+      }
+    },
+    {
+      id: '5',
+      type: 'success',
+      title: 'Tarefa Concluída',
+      message: 'Maria Santos concluiu a tarefa "Elaborar Petição Inicial" com sucesso.',
+      timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), // 8 horas atrás
+      read: true,
+      priority: 'low',
+      category: 'task',
+      actionUrl: '/tasks',
+      metadata: {
+        taskId: '3',
+        completer: 'Maria Santos',
+        processNumber: '3001234-56.2024.8.26.0003'
+      }
+    },
+    {
+      id: '6',
+      type: 'info',
+      title: 'Documento Enviado',
+      message: 'Novo documento "Contrato_Trabalho.pdf" foi adicionado ao processo 1001234-56.2024.8.26.0001.',
+      timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 horas atrás
+      read: false,
+      priority: 'low',
+      category: 'process',
+      actionUrl: '/processes',
+      metadata: {
+        processId: '1',
+        fileName: 'Contrato_Trabalho.pdf',
+        uploader: 'Ana Costa'
+      }
+    },
+    {
+      id: '7',
+      type: 'warning',
+      title: 'Audiência Agendada',
+      message: 'Audiência de conciliação agendada para 25/01/2024 às 14:00h. Processo: Ação Civil.',
+      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 dias atrás
+      read: true,
+      priority: 'high',
+      category: 'deadline',
+      actionUrl: '/timeline',
+      metadata: {
+        processId: '3',
+        hearingDate: '2024-01-25T14:00:00',
+        hearingType: 'Conciliação'
+      }
+    }
+  ],
+
+  get unreadCount() {
+    return get().notifications.filter(n => !n.read).length
+  },
+
+  addNotification: (notificationData) => {
+    const newNotification: Notification = {
+      ...notificationData,
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString(),
+      read: false
+    }
+    
+    set((state) => ({
+      notifications: [newNotification, ...state.notifications]
+    }))
+
+    // Simular notificação push no navegador
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(notificationData.title, {
+        body: notificationData.message,
+        icon: '/vite.svg',
+        tag: newNotification.id
+      })
+    }
+  },
+
+  markAsRead: (id) => {
+    set((state) => ({
+      notifications: state.notifications.map(notification =>
+        notification.id === id ? { ...notification, read: true } : notification
+      )
+    }))
+  },
+
+  markAllAsRead: () => {
+    set((state) => ({
+      notifications: state.notifications.map(notification =>
+        ({ ...notification, read: true })
+      )
+    }))
+  },
+
+  removeNotification: (id) => {
+    set((state) => ({
+      notifications: state.notifications.filter(n => n.id !== id)
+    }))
+  },
+
+  clearAllNotifications: () => {
+    set({ notifications: [] })
+  },
+
+  getNotificationsByCategory: (category) => {
+    return get().notifications.filter(n => n.category === category)
+  },
+
+  getUnreadNotifications: () => {
+    return get().notifications.filter(n => !n.read)
+  }
+}))
+
+// Funções utilitárias para criar notificações específicas
+export const createTaskNotification = (
+  type: 'assigned' | 'completed' | 'deadline_warning' | 'deadline_overdue',
+  taskTitle: string,
+  processNumber: string,
+  metadata?: Record<string, any>
+) => {
+  const notificationMap = {
+    assigned: {
+      type: 'info' as const,
+      title: 'Nova Tarefa',
+      message: `Você foi atribuído à tarefa "${taskTitle}"`,
+      priority: 'medium' as const,
+      category: 'task' as const,
+      actionUrl: '/tasks'
+    },
+    completed: {
+      type: 'success' as const,
+      title: 'Tarefa Concluída',
+      message: `A tarefa "${taskTitle}" foi concluída`,
+      priority: 'low' as const,
+      category: 'task' as const,
+      actionUrl: '/tasks'
+    },
+    deadline_warning: {
+      type: 'warning' as const,
+      title: 'Prazo Próximo',
+      message: `A tarefa "${taskTitle}" vence em breve`,
+      priority: 'high' as const,
+      category: 'deadline' as const,
+      actionUrl: '/tasks'
+    },
+    deadline_overdue: {
+      type: 'error' as const,
+      title: 'Prazo Vencido',
+      message: `A tarefa "${taskTitle}" está atrasada`,
+      priority: 'high' as const,
+      category: 'deadline' as const,
+      actionUrl: '/tasks'
+    }
+  }
+
+  const notificationData = notificationMap[type]
+  
+  useNotificationStore.getState().addNotification({
+    ...notificationData,
+    metadata: {
+      ...metadata,
+      taskTitle,
+      processNumber
+    }
+  })
+}
+
+export const createProcessNotification = (
+  type: 'created' | 'updated' | 'status_changed',
+  processNumber: string,
+  metadata?: Record<string, any>
+) => {
+  const notificationMap = {
+    created: {
+      type: 'info' as const,
+      title: 'Novo Processo',
+      message: `Novo processo ${processNumber} foi criado`,
+      priority: 'medium' as const,
+      category: 'process' as const,
+      actionUrl: '/processes'
+    },
+    updated: {
+      type: 'info' as const,
+      title: 'Processo Atualizado',
+      message: `O processo ${processNumber} foi atualizado`,
+      priority: 'low' as const,
+      category: 'process' as const,
+      actionUrl: '/processes'
+    },
+    status_changed: {
+      type: 'success' as const,
+      title: 'Status Alterado',
+      message: `O status do processo ${processNumber} foi alterado`,
+      priority: 'medium' as const,
+      category: 'process' as const,
+      actionUrl: '/processes'
+    }
+  }
+
+  const notificationData = notificationMap[type]
+  
+  useNotificationStore.getState().addNotification({
+    ...notificationData,
+    metadata: {
+      ...metadata,
+      processNumber
+    }
+  })
+}
+
+export const createPaymentNotification = (
+  type: 'due' | 'overdue' | 'paid',
+  partnerName: string,
+  amount: number,
+  metadata?: Record<string, any>
+) => {
+  const notificationMap = {
+    due: {
+      type: 'warning' as const,
+      title: 'Pagamento Vencendo',
+      message: `Pagamento para ${partnerName} vence em breve`,
+      priority: 'medium' as const,
+      category: 'payment' as const,
+      actionUrl: '/financial'
+    },
+    overdue: {
+      type: 'error' as const,
+      title: 'Pagamento Atrasado',
+      message: `Pagamento para ${partnerName} está atrasado`,
+      priority: 'high' as const,
+      category: 'payment' as const,
+      actionUrl: '/financial'
+    },
+    paid: {
+      type: 'success' as const,
+      title: 'Pagamento Realizado',
+      message: `Pagamento para ${partnerName} foi realizado`,
+      priority: 'low' as const,
+      category: 'payment' as const,
+      actionUrl: '/financial'
+    }
+  }
+
+  const notificationData = notificationMap[type]
+  
+  useNotificationStore.getState().addNotification({
+    ...notificationData,
+    metadata: {
+      ...metadata,
+      partnerName,
+      amount
+    }
+  })
+}
+
+
+
+

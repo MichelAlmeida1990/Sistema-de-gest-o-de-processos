@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  # ===========================================
+  # BANCO DE DADOS POSTGRESQL (PRODUÇÃO)
+  # ===========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: gestao_processos_db_prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - gestao_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================
+  # REDIS (PRODUÇÃO)
+  # ===========================================
+  redis:
+    image: redis:7-alpine
+    container_name: gestao_processos_redis_prod
+    restart: always
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - gestao_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================
+  # BACKEND (PRODUÇÃO)
+  # ===========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: gestao_processos_backend_prod
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - ENVIRONMENT=production
+      - DEBUG=false
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gestao_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================
+  # FRONTEND (PRODUÇÃO)
+  # ===========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: gestao_processos_frontend_prod
+    restart: always
+    environment:
+      - REACT_APP_API_URL=${BACKEND_URL}
+    depends_on:
+      - backend
+    networks:
+      - gestao_network
+
+  # ===========================================
+  # NGINX (PRODUÇÃO)
+  # ===========================================
+  nginx:
+    image: nginx:alpine
+    container_name: gestao_processos_nginx_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./uploads:/var/www/uploads
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - gestao_network
+
+volumes:
+  postgres_data_prod:
+    driver: local
+  redis_data_prod:
+    driver: local
+
+networks:
+  gestao_network:
+    driver: bridge
+

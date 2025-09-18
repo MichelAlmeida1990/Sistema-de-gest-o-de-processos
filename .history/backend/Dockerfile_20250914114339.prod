@@ -1,0 +1,56 @@
+# ===========================================
+# DOCKERFILE PARA PRODUÇÃO
+# ===========================================
+
+FROM python:3.11-slim as builder
+
+# Instalar dependências de build
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar e instalar dependências
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# ===========================================
+# IMAGEM FINAL DE PRODUÇÃO
+# ===========================================
+FROM python:3.11-slim
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Criar usuário não-root
+RUN useradd --create-home --shell /bin/bash app
+
+# Copiar dependências instaladas
+COPY --from=builder /root/.local /home/app/.local
+
+# Definir variáveis de ambiente
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+ENV PATH=/home/app/.local/bin:$PATH
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar código da aplicação
+COPY . .
+
+# Criar diretórios necessários
+RUN mkdir -p /app/uploads /app/logs /app/backups
+RUN chown -R app:app /app
+
+# Mudar para usuário não-root
+USER app
+
+# Expor porta
+EXPOSE 8000
+
+# Comando para produção
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

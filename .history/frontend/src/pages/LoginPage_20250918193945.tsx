@@ -1,0 +1,174 @@
+import React, { useState } from 'react'
+import { Form, Input, Button, Card, Typography, message } from 'antd'
+import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import { useAuth } from '../hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
+import { TwoFactorLogin } from '../components/TwoFactorLogin'
+
+const { Title, Text } = Typography
+
+interface LoginForm {
+  email: string
+  password: string
+}
+
+export function LoginPage() {
+  const [loading, setLoading] = useState(false)
+  const [show2FA, setShow2FA] = useState(false)
+  const [loginCredentials, setLoginCredentials] = useState<LoginForm | null>(null)
+  const { login } = useAuth()
+  const navigate = useNavigate()
+
+  const onFinish = async (values: LoginForm) => {
+    console.log('LOGIN: Tentando fazer login com:', values.email)
+    
+    setLoading(true)
+    
+    try {
+      // Tentar login inicial
+      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+
+      if (response.status === 202) {
+        // 2FA necessário
+        setLoginCredentials(values)
+        setShow2FA(true)
+        setLoading(false)
+        return
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Erro ao fazer login')
+      }
+
+      const data = await response.json()
+      
+      // Login direto (sem 2FA)
+      localStorage.setItem('token', data.access_token)
+      localStorage.setItem('user', JSON.stringify(data.user))
+      
+      message.success('Login realizado com sucesso!')
+      navigate('/dashboard')
+      window.location.reload() // Recarregar para atualizar o contexto
+      
+    } catch (error: any) {
+      console.error('LOGIN: Erro no login:', error)
+      message.error(error.message || 'Erro ao fazer login')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handle2FASuccess = (token: string, user: any) => {
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(user))
+    
+    setShow2FA(false)
+    setLoginCredentials(null)
+    navigate('/dashboard')
+    window.location.reload()
+  }
+
+  const handle2FACancel = () => {
+    setShow2FA(false)
+    setLoginCredentials(null)
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      padding: '20px'
+    }}>
+      <Card 
+        style={{ 
+          width: '100%', 
+          maxWidth: 400,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <Title level={2} style={{ color: '#1890ff', marginBottom: 8 }}>
+            Sistema de Gestão
+          </Title>
+          <Text type="secondary">
+            Acesse sua conta para continuar
+          </Text>
+        </div>
+
+        <Form
+          name="login"
+          onFinish={onFinish}
+          autoComplete="off"
+          size="large"
+        >
+          <Form.Item
+            name="email"
+            rules={[
+              { required: true, message: 'Por favor, digite seu email!' },
+              { type: 'email', message: 'Digite um email válido!' }
+            ]}
+          >
+            <Input 
+              prefix={<UserOutlined />} 
+              placeholder="Digite seu email" 
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            rules={[
+              { required: true, message: 'Por favor, digite sua senha!' }
+            ]}
+          >
+            <Input.Password 
+              prefix={<LockOutlined />} 
+              placeholder="Digite sua senha" 
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              loading={loading}
+              style={{ 
+                width: '100%',
+                height: 45,
+                fontSize: 16
+              }}
+            >
+              Entrar no Sistema
+            </Button>
+          </Form.Item>
+        </Form>
+
+        <div style={{ textAlign: 'center', marginTop: 16 }}>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            Ambiente Seguro ✓
+          </Text>
+        </div>
+      </Card>
+
+      {/* Modal de 2FA */}
+      {show2FA && loginCredentials && (
+        <TwoFactorLogin
+          visible={show2FA}
+          email={loginCredentials.email}
+          password={loginCredentials.password}
+          onSuccess={handle2FASuccess}
+          onCancel={handle2FACancel}
+        />
+      )}
+    </div>
+  )
+}
