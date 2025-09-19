@@ -9,7 +9,7 @@ uvicorn==0.15.0
 
 # Database - versões compatíveis com Python 3.13
 sqlalchemy==1.4.23
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 
 # Authentication & Security
 python-jose[cryptography]==3.3.0
