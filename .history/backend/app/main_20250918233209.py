@@ -12,11 +12,8 @@ try:
 except ImportError:
     SLOWAPI_AVAILABLE = False
     Limiter = None
-try:
-    from slowapi.util import get_remote_address
-    from slowapi.errors import RateLimitExceeded
-except ImportError:
-    pass
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 import time
 import logging
 

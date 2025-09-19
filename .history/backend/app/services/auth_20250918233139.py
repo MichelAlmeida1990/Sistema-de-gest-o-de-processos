@@ -216,8 +216,6 @@ class AuthService:
     @staticmethod
     def verify_2fa_code(secret: str, code: str) -> bool:
         """Verificar código 2FA."""
-        if not PYOTP_AVAILABLE:
-            return False
         totp = pyotp.TOTP(secret)
         return totp.verify(code, valid_window=1)
     

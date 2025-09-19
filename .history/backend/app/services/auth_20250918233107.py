@@ -11,12 +11,7 @@ try:
 except ImportError:
     PYOTP_AVAILABLE = False
     pyotp = None
-try:
-    import qrcode
-    QRCODE_AVAILABLE = True
-except ImportError:
-    QRCODE_AVAILABLE = False
-    qrcode = None
+import qrcode
 from io import BytesIO
 import base64
 
@@ -177,12 +172,6 @@ class AuthService:
                 detail="2FA já está habilitado para este usuário"
             )
         
-        if not PYOTP_AVAILABLE:
-            raise HTTPException(
-                status_code=503,
-                detail="2FA não disponível neste ambiente"
-            )
-        
         # Gerar secret
         secret = pyotp.random_base32()
         
@@ -216,8 +205,6 @@ class AuthService:
     @staticmethod
     def verify_2fa_code(secret: str, code: str) -> bool:
         """Verificar código 2FA."""
-        if not PYOTP_AVAILABLE:
-            return False
         totp = pyotp.TOTP(secret)
         return totp.verify(code, valid_window=1)
     
