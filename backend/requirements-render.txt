@@ -65,5 +65,5 @@ schedule==1.2.0
 reportlab==4.0.7
 jinja2==3.1.2
 
-# WeasyPrint dependencies (podem causar problemas - removidas temporariamente)
+# WeasyPrint dependencies (comentado - causa problemas em alguns sistemas)
 # weasyprint==61.2

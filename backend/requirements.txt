@@ -74,6 +74,6 @@ schedule==1.2.0
 
 # PDF Generation
 reportlab==4.0.7
-weasyprint==61.2
+# weasyprint==61.2  # Comentado - causa problemas em alguns sistemas
 jinja2==3.1.2
 

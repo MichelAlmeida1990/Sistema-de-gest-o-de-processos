@@ -7,7 +7,15 @@ import io
 from datetime import datetime, date
 from typing import Dict, List, Any, Optional
 from jinja2 import Environment, FileSystemLoader
-import weasyprint
+
+# Importação opcional do WeasyPrint (pode não estar disponível em alguns sistemas)
+try:
+    import weasyprint
+    WEASYPRINT_AVAILABLE = True
+except ImportError:
+    WEASYPRINT_AVAILABLE = False
+    print("⚠️  WeasyPrint não está disponível. Usando apenas ReportLab para geração de PDFs.")
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image

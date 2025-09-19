@@ -3,7 +3,7 @@ services:
   - type: web
     name: sistema-processos-api
     env: python
-    buildCommand: "cd backend && pip install fastapi==0.68.0 uvicorn==0.15.0 sqlalchemy==1.4.23 python-jose[cryptography]==3.3.0 passlib[bcrypt]==1.7.4 python-multipart==0.0.5 pydantic==1.10.23"
+    buildCommand: "cd backend && pip install -r requirements-render.txt"
     startCommand: "cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /health
     envVars:
