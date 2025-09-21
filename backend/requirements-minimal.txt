@@ -25,10 +25,10 @@ cryptography==41.0.4
 pyotp==2.9.0
 qrcode[pil]==7.4.2
 
-# Validation - SEM pydantic-core problemático
-pydantic==1.10.12
-pydantic-settings==2.0.3
-email-validator==2.0.0
+# Validation - versões compatíveis com Python 3.13
+pydantic==2.5.3
+pydantic-settings==2.1.0
+email-validator==2.1.0
 
 # HTTP Client
 httpx==0.24.1
