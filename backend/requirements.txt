@@ -25,9 +25,9 @@ cryptography>=41.0.0
 pyotp==2.9.0
 qrcode[pil]==7.4.2
 
-# Validação e Serialização - Versões compatíveis com Render
-pydantic==2.4.2
-pydantic-settings==2.0.3
+# Validação e Serialização - Versões compatíveis com Render e Python 3.13
+pydantic==2.5.3
+pydantic-settings==2.1.0
 email-validator==2.1.0
 
 # HTTP Client

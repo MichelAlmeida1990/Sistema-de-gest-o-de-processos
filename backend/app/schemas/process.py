@@ -3,7 +3,7 @@
 # ===========================================
 
 from typing import Optional, List
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
@@ -82,6 +82,8 @@ class ProcessStats(BaseModel):
     draft: int
     total_value: Decimal
     average_value: Decimal
+
+
 
 
 

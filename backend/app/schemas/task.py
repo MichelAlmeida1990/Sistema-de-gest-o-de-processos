@@ -3,7 +3,7 @@
 # ===========================================
 
 from typing import Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
 
@@ -61,6 +61,8 @@ class TaskList(BaseModel):
     total: int
     page: int
     per_page: int
+
+
 
 
 
