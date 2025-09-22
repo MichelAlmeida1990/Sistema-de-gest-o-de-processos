@@ -1,0 +1,25 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copiar package.json
+COPY package*.json ./
+
+# Instalar dependências
+RUN npm install
+
+# Copiar código
+COPY . .
+
+# Build da aplicação
+RUN npm run build
+
+# Instalar servidor estático
+RUN npm install -g serve
+
+# Expor porta
+EXPOSE 3000
+
+# Comando de inicialização
+CMD ["serve", "-s", "dist", "-l", "3000"]
+
