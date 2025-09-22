@@ -26,7 +26,7 @@ slowapi==0.1.9
 
 # Validation - SEM pydantic v2 para evitar Rust
 pydantic==1.10.12
-pydantic-settings==1.10.1
+pydantic-settings==1.99
 email-validator==1.3.1
 
 # HTTP Client básico
