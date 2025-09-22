@@ -1,0 +1,45 @@
+services:
+  # Backend API
+  - type: web
+    name: sistema-processos-api
+    env: python
+    buildCommand: "cd backend && pip install -r requirements-basic.txt"
+    startCommand: "cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sistema-processos-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: sistema-processos-redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: CORS_ORIGINS
+        value: "https://seu-frontend.vercel.app,http://localhost:3000"
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+
+  # Redis Cache
+  - type: redis
+    name: sistema-processos-redis
+    maxmemoryPolicy: allkeys-lru
+
+# PostgreSQL Database
+databases:
+  - name: sistema-processos-db
+    databaseName: sistema_processos
+    user: postgres

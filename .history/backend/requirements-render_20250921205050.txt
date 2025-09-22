@@ -1,0 +1,69 @@
+# ===========================================
+# REQUIREMENTS PARA RENDER.COM
+# Versões testadas e compatíveis
+# ===========================================
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.9
+
+# Cache
+redis==5.0.1
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+cryptography==41.0.7
+
+# 2FA
+pyotp==2.9.0
+qrcode[pil]==7.4.2
+
+# Validation - Versões estáveis e compatíveis com Python 3.13
+pydantic==2.5.3
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# HTTP Client
+httpx==0.25.2
+aiohttp==3.9.1
+
+# File Processing
+aiofiles==23.2.1
+
+# Logging
+structlog==23.2.0
+
+# Monitoring
+sentry-sdk[fastapi]==1.38.0
+
+# Utils
+python-dateutil==2.8.2
+pytz==2023.3
+click==8.1.7
+
+# Rate Limiting
+slowapi==0.1.9
+
+# Task Queue
+celery==5.3.4
+kombu==5.3.4
+
+# Email
+fastapi-mail==1.4.1
+
+# Scheduling
+schedule==1.2.0
+
+# PDF Generation
+reportlab==4.0.7
+jinja2==3.1.2
+
+# WeasyPrint dependencies (comentado - causa problemas em alguns sistemas)
+# weasyprint==61.2

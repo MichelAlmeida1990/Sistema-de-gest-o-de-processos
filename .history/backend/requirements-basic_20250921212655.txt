@@ -1,0 +1,35 @@
+# ===========================================
+# REQUIREMENTS ULTRA COMPATÍVEL COM PYTHON 3.13
+# Versões mais antigas mas estáveis
+# ===========================================
+
+# Core Framework - versões mais antigas e estáveis
+fastapi==0.92.0
+uvicorn==0.20.0
+
+# Database - versões estáveis
+sqlalchemy==1.4.46
+psycopg2-binary==2.9.6
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.5
+cryptography==38.0.4
+
+# Utils básicos
+python-dateutil==2.8.2
+click==8.1.7
+
+# Rate Limiting
+slowapi==0.1.8
+
+# Validation - versões mais antigas e estáveis
+pydantic==1.10.7
+email-validator==1.3.1
+
+# HTTP Client básico
+httpx==0.24.0
+
+# File processing
+aiofiles==23.1.0

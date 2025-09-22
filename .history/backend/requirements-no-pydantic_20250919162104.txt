@@ -1,0 +1,26 @@
+# ===========================================
+# REQUIREMENTS SEM PYDANTIC - RENDER COMPATIBLE
+# Usando apenas dependências que não precisam compilar
+# ===========================================
+
+# Core Framework
+fastapi==0.68.0
+uvicorn[standard]==0.15.0
+
+# Database
+sqlalchemy==1.4.23
+psycopg2-binary==2.9.7
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.5
+
+# Validation (mínimo necessário)
+pydantic==1.10.23
+pydantic-settings==2.0.3
+email-validator==2.0.0
+
+# Utils básicos
+python-dateutil==2.8.2
+click==8.1.7

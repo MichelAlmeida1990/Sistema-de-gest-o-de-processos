@@ -1,0 +1,34 @@
+# ===========================================
+# REQUIREMENTS COM SQLITE PARA RENDER
+# Evita problemas de PostgreSQL no Python 3.13
+# ===========================================
+
+# Core Framework
+fastapi==0.68.0
+uvicorn==0.15.0
+
+# Database - SQLite (sem problemas de compilação)
+sqlalchemy==1.4.23
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.5
+
+# Utils básicos
+python-dateutil==2.8.2
+click==8.1.7
+
+# 2FA
+pyotp==2.9.0
+qrcode[pil]==7.4.2
+
+# Rate Limiting
+slowapi==0.1.9
+
+# Validation
+pydantic==1.10.23
+email-validator==2.0.0
+
+# Dependências do FastAPI
+starlette==0.14.2
