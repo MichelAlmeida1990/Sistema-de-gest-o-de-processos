@@ -3,12 +3,11 @@
 # ===========================================
 
 from typing import List, Optional
-from pydantic import validator
-from pydantic_settings import BaseSettings
+from pydantic import BaseModel, validator
 import os
 
 
-class Settings(BaseSettings):
+class Settings(BaseModel):
     """Configurações da aplicação usando Pydantic."""
     
     # ===========================================
@@ -166,12 +165,82 @@ class Settings(BaseSettings):
     
     class Config:
         """Configurações do Pydantic."""
-        env_file = ".env"
         case_sensitive = True
+    
+    @classmethod
+    def load_from_env(cls):
+        """Carregar configurações das variáveis de ambiente."""
+        return cls(
+            # Informações básicas
+            PROJECT_NAME=os.getenv("PROJECT_NAME", "Sistema de Gestão de Processos"),
+            VERSION=os.getenv("VERSION", "1.0.0"),
+            DESCRIPTION=os.getenv("DESCRIPTION", "Sistema web para controle de processos e gestão de cálculos"),
+            ENVIRONMENT=os.getenv("ENVIRONMENT", "development"),
+            DEBUG=os.getenv("DEBUG", "true").lower() == "true",
+            
+            # API
+            API_V1_STR=os.getenv("API_V1_STR", "/api/v1"),
+            ALLOWED_HOSTS=os.getenv("ALLOWED_HOSTS", "*").split(","),
+            
+            # Banco de dados
+            POSTGRES_HOST=os.getenv("POSTGRES_HOST", "localhost"),
+            POSTGRES_PORT=int(os.getenv("POSTGRES_PORT", "5432")),
+            POSTGRES_DB=os.getenv("POSTGRES_DB", "gestao_processos"),
+            POSTGRES_USER=os.getenv("POSTGRES_USER", "postgres"),
+            POSTGRES_PASSWORD=os.getenv("POSTGRES_PASSWORD", "postgres123"),
+            DATABASE_URL=os.getenv("DATABASE_URL"),
+            
+            # Redis
+            REDIS_HOST=os.getenv("REDIS_HOST", "localhost"),
+            REDIS_PORT=int(os.getenv("REDIS_PORT", "6379")),
+            REDIS_PASSWORD=os.getenv("REDIS_PASSWORD"),
+            REDIS_DB=int(os.getenv("REDIS_DB", "0")),
+            
+            # Segurança
+            SECRET_KEY=os.getenv("SECRET_KEY", "your-super-secret-key-change-in-production-123456789"),
+            ACCESS_TOKEN_EXPIRE_MINUTES=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")),
+            REFRESH_TOKEN_EXPIRE_DAYS=int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7")),
+            ALGORITHM=os.getenv("ALGORITHM", "HS256"),
+            ENCRYPTION_KEY=os.getenv("ENCRYPTION_KEY", "your-encryption-key-32-characters"),
+            TOTP_ISSUER=os.getenv("TOTP_ISSUER", "Gestão Processos"),
+            
+            # Upload de arquivos
+            UPLOAD_DIR=os.getenv("UPLOAD_DIR", "./uploads"),
+            MAX_FILE_SIZE=int(os.getenv("MAX_FILE_SIZE", "52428800")),
+            ALLOWED_FILE_TYPES=os.getenv("ALLOWED_FILE_TYPES", "application/pdf,image/jpeg,image/png").split(","),
+            
+            # Email
+            SMTP_HOST=os.getenv("SMTP_HOST"),
+            SMTP_PORT=int(os.getenv("SMTP_PORT", "587")),
+            SMTP_USER=os.getenv("SMTP_USER"),
+            SMTP_PASSWORD=os.getenv("SMTP_PASSWORD"),
+            FROM_EMAIL=os.getenv("FROM_EMAIL", "noreply@gestaoprocessos.com"),
+            FROM_NAME=os.getenv("FROM_NAME", "Sistema Gestão Processos"),
+            
+            # Logging
+            LOG_LEVEL=os.getenv("LOG_LEVEL", "INFO"),
+            LOG_DIR=os.getenv("LOG_DIR", "./logs"),
+            SENTRY_DSN=os.getenv("SENTRY_DSN"),
+            
+            # Rate limiting
+            RATE_LIMIT_PER_MINUTE=int(os.getenv("RATE_LIMIT_PER_MINUTE", "60")),
+            RATE_LIMIT_PER_HOUR=int(os.getenv("RATE_LIMIT_PER_HOUR", "1000")),
+            
+            # Backup
+            BACKUP_DIR=os.getenv("BACKUP_DIR", "./backups"),
+            BACKUP_CRON=os.getenv("BACKUP_CRON", "0 2 * * *"),
+            BACKUP_RETENTION_DAYS=int(os.getenv("BACKUP_RETENTION_DAYS", "30")),
+            
+            # Configurações de negócio
+            DEFAULT_CURRENCY=os.getenv("DEFAULT_CURRENCY", "BRL"),
+            TIMEZONE=os.getenv("TIMEZONE", "America/Sao_Paulo"),
+            DATE_FORMAT=os.getenv("DATE_FORMAT", "%d/%m/%Y"),
+            DATETIME_FORMAT=os.getenv("DATETIME_FORMAT", "%d/%m/%Y %H:%M:%S"),
+        )
 
 
 # Instância global das configurações
-settings = Settings()
+settings = Settings.load_from_env()
 
 # ===========================================
 # CONFIGURAÇÕES POR AMBIENTE
