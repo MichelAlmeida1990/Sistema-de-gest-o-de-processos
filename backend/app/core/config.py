@@ -3,7 +3,7 @@
 # ===========================================
 
 from typing import List, Optional
-from pydantic import field_validator
+from pydantic import validator
 from pydantic_settings import BaseSettings
 import os
 
@@ -143,8 +143,7 @@ class Settings(BaseSettings):
     # VALIDAÇÕES
     # ===========================================
     
-    @field_validator("SECRET_KEY")
-    @classmethod
+    @validator("SECRET_KEY")
     def validate_secret_key(cls, v):
         """Validar se a chave secreta é segura."""
         if len(v) < 32:
@@ -158,18 +157,17 @@ class Settings(BaseSettings):
     #         raise ValueError("ENCRYPTION_KEY deve ter exatamente 32 caracteres")
     #     return v
     
-    @field_validator("ALLOWED_HOSTS")
-    @classmethod
+    @validator("ALLOWED_HOSTS")
     def validate_allowed_hosts(cls, v):
         """Validar hosts permitidos."""
         if "*" in v and len(v) > 1:
             raise ValueError("Não é possível usar '*' com outros hosts")
         return v
     
-    model_config = {
-        "env_file": ".env",
-        "case_sensitive": True
-    }
+    class Config:
+        """Configurações do Pydantic."""
+        env_file = ".env"
+        case_sensitive = True
 
 
 # Instância global das configurações

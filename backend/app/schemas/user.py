@@ -3,7 +3,7 @@
 # ===========================================
 
 from typing import Optional, List
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, validator
 from datetime import datetime
 from enum import Enum
 
@@ -18,8 +18,7 @@ class UserCreate(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     role: UserRole = UserRole.LAWYER
     
-    @field_validator('password')
-    @classmethod
+    @validator('password')
     def validate_password(cls, v):
         if len(v) < 8:
             raise ValueError('Senha deve ter pelo menos 8 caracteres')
@@ -70,7 +69,8 @@ class UserProfile(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
 
 class UserResponse(BaseModel):
     """Schema para resposta de usuário."""
@@ -92,15 +92,15 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
 
 class UserChangePassword(BaseModel):
     """Schema para mudança de senha."""
     current_password: str
     new_password: str = Field(..., min_length=8)
     
-    @field_validator('new_password')
-    @classmethod
+    @validator('new_password')
     def validate_new_password(cls, v):
         if len(v) < 8:
             raise ValueError('Nova senha deve ter pelo menos 8 caracteres')
