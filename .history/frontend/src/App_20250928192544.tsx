@@ -54,8 +54,6 @@ function AppContent() {
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/deliveries" element={<DeliveriesPage />} />
         <Route path="/financial" element={<FinancialPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/search" element={<SearchPage />} />
         <Route path="/admin" element={<AdminPage />} />
         
         {/* Rota de fallback */}
