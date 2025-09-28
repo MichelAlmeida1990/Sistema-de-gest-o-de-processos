@@ -111,26 +111,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  const loginWithToken = async (token: string, userData: User): Promise<boolean> => {
-    try {
-      setIsLoading(true)
-      
-      // Salvar dados
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(userData))
-      setUser(userData)
-      
-      message.success('Login automático realizado!')
-      return true
-    } catch (error) {
-      console.error('Erro no login com token:', error)
-      message.error('Erro no login automático')
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const logout = () => {
     // Desconectar WebSocket
     websocketService.disconnect()
@@ -145,7 +125,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user,
     isLoading,
     login,
-    loginWithToken,
     logout,
   }
 

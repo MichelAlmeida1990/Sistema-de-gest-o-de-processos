@@ -32,8 +32,8 @@ export function LoginPage() {
     try {
       // Login automático com usuário padrão para mobile
       const mobileCredentials = {
-        email: 'admin@sistema.com',
-        password: 'qualquer_senha'
+        email: 'admin@gestorjuridico.com',
+        password: '123456'
       }
       
       // Usar configuração dinâmica da API
@@ -51,7 +51,8 @@ export function LoginPage() {
 
       if (response.ok) {
         const data = await response.json()
-        await loginWithToken(data.access_token, data.user)
+        await login(data.access_token, data.user)
+        message.success('Login automático realizado!')
         navigate('/dashboard')
       } else {
         const errorData = await response.json().catch(() => ({ detail: 'Erro desconhecido' }))

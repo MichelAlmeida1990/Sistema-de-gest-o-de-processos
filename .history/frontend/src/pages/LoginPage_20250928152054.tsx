@@ -32,8 +32,8 @@ export function LoginPage() {
     try {
       // Login automático com usuário padrão para mobile
       const mobileCredentials = {
-        email: 'admin@sistema.com',
-        password: 'qualquer_senha'
+        email: 'admin@gestorjuridico.com',
+        password: '123456'
       }
       
       // Usar configuração dinâmica da API

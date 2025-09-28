@@ -548,7 +548,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         <Content style={{
           ...gradientStyles.content,
           marginTop: '64px',
-          padding: isMobileDevice ? '16px' : '24px',
+          padding: '24px',
           overflow: 'auto'
         }}>
           {children}

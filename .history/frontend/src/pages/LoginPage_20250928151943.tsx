@@ -17,7 +17,7 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [show2FA, setShow2FA] = useState(false)
   const [loginCredentials, setLoginCredentials] = useState<LoginForm | null>(null)
-  const { login, loginWithToken } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
 
   // Login automático para mobile
@@ -32,8 +32,8 @@ export function LoginPage() {
     try {
       // Login automático com usuário padrão para mobile
       const mobileCredentials = {
-        email: 'admin@sistema.com',
-        password: 'qualquer_senha'
+        email: 'admin@gestorjuridico.com',
+        password: '123456'
       }
       
       // Usar configuração dinâmica da API
@@ -51,7 +51,8 @@ export function LoginPage() {
 
       if (response.ok) {
         const data = await response.json()
-        await loginWithToken(data.access_token, data.user)
+        await login(data.access_token, data.user)
+        message.success('Login automático realizado!')
         navigate('/dashboard')
       } else {
         const errorData = await response.json().catch(() => ({ detail: 'Erro desconhecido' }))
@@ -126,7 +127,7 @@ export function LoginPage() {
     setLoginCredentials(null)
   }
 
-  // Se for mobile, mostrar loading ou formulário de fallback
+  // Se for mobile, mostrar loading
   if (isMobile()) {
     return (
       <div style={{
@@ -149,56 +150,11 @@ export function LoginPage() {
             Sistema de Gestão
           </Title>
           <Text type="secondary" style={{ marginBottom: 32 }}>
-            {loading ? 'Login automático em andamento...' : 'Login automático falhou - use o formulário abaixo'}
+            Login automático em andamento...
           </Text>
-          
-          {loading ? (
-            <Button type="primary" loading={true} size="large" block>
-              Conectando...
-            </Button>
-          ) : (
-            <Form
-              name="mobile-login"
-              onFinish={onFinish}
-              autoComplete="off"
-              size="large"
-            >
-              <Form.Item
-                name="email"
-                rules={[
-                  { required: true, message: 'Por favor, digite seu email!' },
-                  { type: 'email', message: 'Digite um email válido!' }
-                ]}
-              >
-                <Input 
-                  prefix={<UserOutlined />} 
-                  placeholder="Digite seu email" 
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="password"
-                rules={[{ required: true, message: 'Por favor, digite sua senha!' }]}
-              >
-                <Input.Password 
-                  prefix={<LockOutlined />} 
-                  placeholder="Digite sua senha" 
-                />
-              </Form.Item>
-
-              <Form.Item>
-                <Button 
-                  type="primary" 
-                  htmlType="submit" 
-                  loading={loading} 
-                  size="large" 
-                  block
-                >
-                  Entrar
-                </Button>
-              </Form.Item>
-            </Form>
-          )}
+          <Button type="primary" loading={loading} size="large" block>
+            Conectando...
+          </Button>
         </Card>
       </div>
     )

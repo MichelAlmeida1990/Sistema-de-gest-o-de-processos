@@ -350,13 +350,13 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       }}>
         <Header style={{
           ...gradientStyles.header,
-          padding: isMobileDevice ? '0 16px' : '0 24px',
+          padding: '0 24px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           position: 'fixed',
           top: 0,
-          left: isMobileDevice ? 0 : (collapsed ? 80 : 280),
+          left: collapsed ? 80 : 280,
           right: 0,
           zIndex: 999,
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -364,14 +364,8 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
           <Space>
             <Button
               type="text"
-              icon={isMobileDevice ? <MenuUnfoldOutlined /> : (collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />)}
-              onClick={() => {
-                if (isMobileDevice) {
-                  setMobileDrawerVisible(true)
-                } else {
-                  setCollapsed(!collapsed)
-                }
-              }}
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
               style={{
                 color: darkMode ? '#ffffff' : '#031f5f',
                 fontSize: '16px',
@@ -385,13 +379,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               }}
             />
             
-            {/* Search Bar - Hidden on mobile */}
-            {!isMobileDevice && (
-              <div style={{
-                position: 'relative',
-                width: '300px',
-                minWidth: '200px'
-              }}>
+            {/* Search Bar */}
+            <div style={{
+              position: 'relative',
+              width: '300px',
+              minWidth: '200px'
+            }}>
               <input
                 type="text"
                 placeholder="Buscar processos, tarefas..."
@@ -430,7 +423,6 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                 color: darkMode ? '#cccccc' : '#999999'
               }} />
             </div>
-            )}
           </Space>
 
           <Space size="middle">
@@ -548,7 +540,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         <Content style={{
           ...gradientStyles.content,
           marginTop: '64px',
-          padding: isMobileDevice ? '16px' : '24px',
+          padding: '24px',
           overflow: 'auto'
         }}>
           {children}

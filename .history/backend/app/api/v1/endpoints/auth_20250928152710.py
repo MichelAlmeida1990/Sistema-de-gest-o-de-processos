@@ -62,19 +62,11 @@ async def login(
         access_token = AuthService.create_access_token(data={"sub": user.email})
         refresh_token = AuthService.create_refresh_token(data={"sub": user.email})
         
-        from app.schemas.auth import Token
-        
-        token = Token(
+        return LoginResponse(
             access_token=access_token,
             refresh_token=refresh_token,
             token_type="bearer",
-            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
-        )
-        
-        return LoginResponse(
-            user=user,
-            token=token,
-            requires_2fa=False
+            user=user
         )
         
     except HTTPException:

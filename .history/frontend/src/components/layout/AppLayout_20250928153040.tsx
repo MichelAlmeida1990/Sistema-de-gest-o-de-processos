@@ -44,21 +44,6 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   const { user, logout } = useAuth()
   const { unreadCount } = useNotificationStore()
 
-  // Detectar mobile e ajustar layout
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobile = isMobile()
-      setIsMobileDevice(mobile)
-      if (mobile) {
-        setCollapsed(true) // Sempre colapsado em mobile
-      }
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
   const menuItems = [
     {
       key: '/dashboard',
@@ -199,25 +184,23 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      {/* Desktop Sider */}
-      {!isMobileDevice && (
-        <Sider
-          trigger={null}
-          collapsible
-          collapsed={collapsed}
-          width={280}
-          collapsedWidth={80}
-          style={{
-            ...gradientStyles.sider,
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            zIndex: 1000,
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            overflow: 'hidden'
-          }}
-        >
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        width={280}
+        collapsedWidth={80}
+        style={{
+          ...gradientStyles.sider,
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          zIndex: 1000,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          overflow: 'hidden'
+        }}
+      >
         {/* Logo */}
         <div style={{
           padding: collapsed ? '16px 8px' : '24px 16px',
@@ -278,85 +261,18 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
             }
           }))}
         />
-        </Sider>
-      )}
+      </Sider>
 
-      {/* Mobile Drawer */}
-      <Drawer
-        title={
-          <div style={{ textAlign: 'center', padding: '16px 0' }}>
-            <JustaCausaLogo 
-              collapsed={false} 
-              darkMode={darkMode} 
-              size={40} 
-            />
-          </div>
-        }
-        placement="left"
-        onClose={() => setMobileDrawerVisible(false)}
-        open={mobileDrawerVisible}
-        width={280}
-        style={{
-          background: darkMode 
-            ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
-            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-        }}
-        bodyStyle={{
-          padding: 0,
-          background: 'transparent'
-        }}
-      >
-        <Menu
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          onClick={(e) => {
-            handleMenuClick(e)
-            setMobileDrawerVisible(false)
-          }}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: '16px 8px'
-          }}
-          items={menuItems.map(item => ({
-            ...item,
-            style: {
-              margin: '4px 0',
-              borderRadius: '12px',
-              height: '48px',
-              display: 'flex',
-              alignItems: 'center',
-              fontWeight: '500',
-              transition: 'all 0.3s ease',
-              background: location.pathname === item.key 
-                ? (darkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)')
-                : 'transparent',
-              color: darkMode ? '#ffffff' : '#ffffff',
-              padding: '12px 16px',
-              width: '100%',
-              minWidth: 'auto',
-              boxShadow: location.pathname === item.key 
-                ? (darkMode ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(255, 255, 255, 0.2)')
-                : 'none',
-              overflow: 'hidden'
-            }
-          }))}
-        />
-      </Drawer>
-
-      <Layout style={{ 
-        marginLeft: isMobileDevice ? 0 : (collapsed ? 80 : 280), 
-        transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' 
-      }}>
+      <Layout style={{ marginLeft: collapsed ? 80 : 280, transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>
         <Header style={{
           ...gradientStyles.header,
-          padding: isMobileDevice ? '0 16px' : '0 24px',
+          padding: '0 24px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           position: 'fixed',
           top: 0,
-          left: isMobileDevice ? 0 : (collapsed ? 80 : 280),
+          left: collapsed ? 80 : 280,
           right: 0,
           zIndex: 999,
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -364,14 +280,8 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
           <Space>
             <Button
               type="text"
-              icon={isMobileDevice ? <MenuUnfoldOutlined /> : (collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />)}
-              onClick={() => {
-                if (isMobileDevice) {
-                  setMobileDrawerVisible(true)
-                } else {
-                  setCollapsed(!collapsed)
-                }
-              }}
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
               style={{
                 color: darkMode ? '#ffffff' : '#031f5f',
                 fontSize: '16px',
@@ -385,13 +295,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               }}
             />
             
-            {/* Search Bar - Hidden on mobile */}
-            {!isMobileDevice && (
-              <div style={{
-                position: 'relative',
-                width: '300px',
-                minWidth: '200px'
-              }}>
+            {/* Search Bar */}
+            <div style={{
+              position: 'relative',
+              width: '300px',
+              minWidth: '200px'
+            }}>
               <input
                 type="text"
                 placeholder="Buscar processos, tarefas..."
@@ -430,7 +339,6 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                 color: darkMode ? '#cccccc' : '#999999'
               }} />
             </div>
-            )}
           </Space>
 
           <Space size="middle">
@@ -548,7 +456,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         <Content style={{
           ...gradientStyles.content,
           marginTop: '64px',
-          padding: isMobileDevice ? '16px' : '24px',
+          padding: '24px',
           overflow: 'auto'
         }}>
           {children}

@@ -385,13 +385,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               }}
             />
             
-            {/* Search Bar - Hidden on mobile */}
-            {!isMobileDevice && (
-              <div style={{
-                position: 'relative',
-                width: '300px',
-                minWidth: '200px'
-              }}>
+            {/* Search Bar */}
+            <div style={{
+              position: 'relative',
+              width: '300px',
+              minWidth: '200px'
+            }}>
               <input
                 type="text"
                 placeholder="Buscar processos, tarefas..."
@@ -430,7 +429,6 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                 color: darkMode ? '#cccccc' : '#999999'
               }} />
             </div>
-            )}
           </Space>
 
           <Space size="middle">
@@ -548,7 +546,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         <Content style={{
           ...gradientStyles.content,
           marginTop: '64px',
-          padding: isMobileDevice ? '16px' : '24px',
+          padding: '24px',
           overflow: 'auto'
         }}>
           {children}
