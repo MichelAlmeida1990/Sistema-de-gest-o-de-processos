@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copiar requirements e instalar dependências Python
-COPY backend/requirements-render.txt .
-RUN pip install --no-cache-dir -r requirements-render.txt
+COPY backend/requirements-render.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar código da aplicação
 COPY backend/ .
