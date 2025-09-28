@@ -177,14 +177,19 @@ async def health_check():
         db.execute(text("SELECT 1"))
         db.close()
         
-        # Verificar Redis
-        from app.core.redis import redis_client
-        await redis_client.ping()
+        # Redis é opcional - não falhar se não estiver disponível
+        redis_status = "disconnected"
+        try:
+            from app.core.redis import redis_client
+            await redis_client.ping()
+            redis_status = "connected"
+        except Exception as redis_error:
+            logger.warning(f"Redis not available: {redis_error}")
         
         return {
             "status": "healthy",
             "database": "connected",
-            "redis": "connected",
+            "redis": redis_status,
             "timestamp": time.time()
         }
     except Exception as e:
