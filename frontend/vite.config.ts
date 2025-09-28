@@ -28,7 +28,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     minify: 'esbuild', // Usar esbuild em vez de terser para melhor compatibilidade
-    target: 'es2015',
+    target: 'es2018', // Melhor compatibilidade com mobile
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {

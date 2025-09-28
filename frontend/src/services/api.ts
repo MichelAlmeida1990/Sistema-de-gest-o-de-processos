@@ -24,17 +24,26 @@ export interface PaginatedResponse<T> {
 // ===========================================
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { getMobileConfig, isMobile } from '../utils/mobile'
 
 class ApiService {
   private api: AxiosInstance
   private token: string | null = null
 
   constructor() {
+    const mobileConfig = getMobileConfig()
+    
     this.api = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 10000, // Reduzir timeout para 10 segundos
+      timeout: mobileConfig.timeout, // Timeout dinâmico baseado na conexão
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache',
+        ...(isMobile() && {
+          'User-Agent': navigator.userAgent,
+          'X-Requested-With': 'XMLHttpRequest'
+        })
       },
     })
 
