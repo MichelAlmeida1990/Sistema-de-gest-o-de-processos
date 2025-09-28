@@ -11,8 +11,11 @@ RUN apt-get update && apt-get install -y \
 # Definir diretório de trabalho
 WORKDIR /app
 
+# Instalar Jinja2 primeiro para garantir que está disponível
+RUN pip install --no-cache-dir jinja2==3.1.2
+
 # Copiar requirements e instalar dependências Python
-COPY backend/requirements-simple.txt requirements.txt
+COPY backend/requirements-ultra-simple.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar código da aplicação
