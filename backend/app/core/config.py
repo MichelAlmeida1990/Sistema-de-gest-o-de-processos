@@ -3,7 +3,7 @@
 # ===========================================
 
 from typing import List, Optional
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, validator
 import os
 
 
@@ -142,7 +142,7 @@ class Settings(BaseModel):
     # VALIDAÇÕES
     # ===========================================
     
-    @field_validator("SECRET_KEY")
+    @validator("SECRET_KEY")
     @classmethod
     def validate_secret_key(cls, v):
         """Validar se a chave secreta é segura."""
@@ -157,7 +157,7 @@ class Settings(BaseModel):
     #         raise ValueError("ENCRYPTION_KEY deve ter exatamente 32 caracteres")
     #     return v
     
-    @field_validator("ALLOWED_HOSTS")
+    @validator("ALLOWED_HOSTS")
     @classmethod
     def validate_allowed_hosts(cls, v):
         """Validar hosts permitidos."""
