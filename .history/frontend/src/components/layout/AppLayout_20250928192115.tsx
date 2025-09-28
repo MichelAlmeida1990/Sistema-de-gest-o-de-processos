@@ -109,18 +109,6 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       path: '/financial'
     },
     {
-      key: '/notifications',
-      icon: <BellOutlined />,
-      label: 'Notificações',
-      path: '/notifications'
-    },
-    {
-      key: '/search',
-      icon: <SearchOutlined />,
-      label: 'Busca',
-      path: '/search'
-    },
-    {
       key: '/admin',
       icon: <SettingOutlined />,
       label: 'Admin',
