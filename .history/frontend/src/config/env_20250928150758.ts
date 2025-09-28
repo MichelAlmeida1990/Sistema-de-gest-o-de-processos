@@ -21,7 +21,7 @@ export const config = {
   
   // WebSocket (ajustável para produção)
   WS_URL: import.meta.env.VITE_WS_URL || 
-          (import.meta.env.VITE_API_URL || 'http://192.168.0.16:8000').replace('http', 'ws'),
+          (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace('http', 'ws'),
   
   // Features (podem ser desabilitadas via env vars)
   FEATURES: {
