@@ -4,7 +4,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud, email
+from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud
 
 # ===========================================
 # ROUTER PRINCIPAL
@@ -100,12 +100,12 @@ api_router.include_router(
 #     tags=["Relatórios PDF"]
 # )
 
-# Sistema de Email
-api_router.include_router(
-    email.router,
-    prefix="/email",
-    tags=["Sistema de Email"]
-)
+# Sistema de Email - TEMPORARIAMENTE DESABILITADO
+# api_router.include_router(
+#     email.router,
+#     prefix="/email",
+#     tags=["Sistema de Email"]
+# )
 
 # ===========================================
 # ROTA DE STATUS DA API
