@@ -4,7 +4,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud, pdf_reports, email
+from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud, email
 
 # ===========================================
 # ROUTER PRINCIPAL
@@ -93,12 +93,12 @@ api_router.include_router(
     tags=["DataJud (CNJ)"]
 )
 
-# Relatórios PDF
-api_router.include_router(
-    pdf_reports.router,
-    prefix="/pdf-reports",
-    tags=["Relatórios PDF"]
-)
+# Relatórios PDF - TEMPORARIAMENTE DESABILITADO
+# api_router.include_router(
+#     pdf_reports.router,
+#     prefix="/pdf-reports",
+#     tags=["Relatórios PDF"]
+# )
 
 # Sistema de Email
 api_router.include_router(
