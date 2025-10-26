@@ -4,7 +4,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud
+from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud, funnel, financial, dashboard
 
 # ===========================================
 # ROUTER PRINCIPAL
@@ -91,6 +91,27 @@ api_router.include_router(
     datajud.router,
     prefix="/datajud",
     tags=["DataJud (CNJ)"]
+)
+
+# Funil de Processos
+api_router.include_router(
+    funnel.router,
+    prefix="/funnel",
+    tags=["Funil de Processos"]
+)
+
+# Financeiro
+api_router.include_router(
+    financial.router,
+    prefix="/financial",
+    tags=["Financeiro"]
+)
+
+# Dashboard
+api_router.include_router(
+    dashboard.router,
+    prefix="/dashboard",
+    tags=["Dashboard"]
 )
 
 # Relatórios PDF - TEMPORARIAMENTE DESABILITADO

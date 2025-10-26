@@ -57,6 +57,11 @@ class Process(BaseModel):
     user_id = Column(ForeignKey("users.id"), nullable=False)
     user = relationship("User", foreign_keys=[user_id])
     
+    # Funil de processos (temporariamente desabilitado para evitar problemas de importação)
+    # funnel_id = Column(ForeignKey("process_funnels.id"), nullable=True)
+    # funnel = relationship("ProcessFunnel", foreign_keys=[funnel_id], lazy="select")
+    # stage_history = relationship("ProcessStage", foreign_keys="ProcessStage.process_id", lazy="select")
+    
     tasks = relationship("Task", foreign_keys="Task.process_id")
     files = relationship("File", foreign_keys="File.process_id")
     timeline_events = relationship("TimelineEvent", foreign_keys="TimelineEvent.process_id")

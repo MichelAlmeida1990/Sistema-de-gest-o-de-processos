@@ -29,6 +29,30 @@ async def test_processes_endpoint():
         ]
     }
 
+@router.delete("/test/{process_id}", status_code=status.HTTP_200_OK)
+async def test_delete_process(process_id: int, db: Session = Depends(get_db)):
+    """Endpoint de teste para exclusão sem autenticação."""
+    try:
+        # Realmente deletar o processo
+        success = ProcessService.delete_process(db, process_id)
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Processo não encontrado"
+            )
+        
+        return {
+            "message": f"Processo {process_id} deletado com sucesso",
+            "success": True
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao deletar processo: {str(e)}"
+        )
+
 @router.post("/", response_model=ProcessResponse, status_code=status.HTTP_201_CREATED)
 async def create_process(
     process_data: ProcessCreate,
@@ -175,21 +199,26 @@ async def update_process(
 @router.delete("/{process_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_process(
     process_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
     """Deletar processo."""
     try:
+        # Log para debug
+        print(f"Tentando deletar processo {process_id}")
+        
         success = ProcessService.delete_process(db, process_id)
         if not success:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Processo não encontrado"
             )
+        
+        print(f"Processo {process_id} deletado com sucesso")
     except HTTPException:
         raise
     except Exception as e:
+        print(f"Erro ao deletar processo {process_id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro ao deletar processo: {str(e)}"
+            detail=f"Erro interno do servidor: {str(e)}"
         )

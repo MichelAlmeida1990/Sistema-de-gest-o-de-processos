@@ -69,6 +69,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.removeItem('user')
         localStorage.removeItem('token')
       }
+    } else {
+      // Redirecionar para login se não há usuário
+      if (window.location.pathname !== '/login') {
+        console.log('Usuário não logado, redirecionando para login...')
+        window.location.href = '/login'
+      }
     }
     
     setIsLoading(false)

@@ -36,79 +36,25 @@ export const ProcessesPage: React.FC = () => {
   const loadProcesses = async () => {
     setLoading(true)
     try {
-      // Temporariamente usando dados mockados para evitar timeout
       console.log('Carregando processos...')
       
-      // Simular delay da API
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Usar dados reais da API
+      const response = await processService.getProcesses({
+        page: currentPage,
+        limit: pageSize
+      })
       
-      const mockProcesses = [
-        {
-          id: 1,
-          title: "Ação Trabalhista - Rescisão Indireta",
-          description: "Processo de rescisão indireta por justa causa do empregador",
-          process_number: "1001234-56.2024.8.26.0001",
-          client_name: "João Silva Santos",
-          client_document: "123.456.789-00",
-          status: "active",
-          priority: "high",
-          estimated_value: 25000.00,
-          category: "Trabalhista",
-          user_id: 1,
-          created_at: "2024-01-15T10:00:00Z",
-          updated_at: "2024-01-20T15:30:00Z"
-        },
-        {
-          id: 2,
-          title: "Processo Criminal - Furto Qualificado",
-          description: "Defesa em processo criminal por furto qualificado",
-          process_number: "2001234-56.2024.8.26.0002",
-          client_name: "Maria Santos Lima",
-          client_document: "987.654.321-00",
-          status: "completed",
-          priority: "urgent",
-          estimated_value: 15000.00,
-          actual_value: 12000.00,
-          category: "Criminal",
-          user_id: 1,
-          created_at: "2024-01-10T09:00:00Z",
-          updated_at: "2024-01-25T14:00:00Z"
-        },
-        {
-          id: 3,
-          title: "Ação Civil - Danos Morais",
-          description: "Ação de indenização por danos morais e materiais",
-          process_number: "3001234-56.2024.8.26.0003",
-          client_name: "Carlos Lima Costa",
-          client_document: "456.789.123-00",
-          status: "active",
-          priority: "medium",
-          estimated_value: 50000.00,
-          category: "Civil",
-          user_id: 1,
-          created_at: "2024-01-20T11:00:00Z",
-          updated_at: "2024-01-22T16:45:00Z"
-        }
-      ]
+      setProcesses(response.processes)
+      setTotal(response.total)
       
-      // Filtrar por busca se houver
-      let filteredProcesses = mockProcesses
-      if (searchText) {
-        filteredProcesses = mockProcesses.filter(p => 
-          p.title.toLowerCase().includes(searchText.toLowerCase()) ||
-          p.client_name.toLowerCase().includes(searchText.toLowerCase()) ||
-          p.process_number.includes(searchText)
-        )
-      }
-      
-      setProcesses(filteredProcesses)
-      setTotal(filteredProcesses.length)
-      
-      console.log('Processos carregados com sucesso (mock data)')
+      console.log('Processos carregados com sucesso (dados reais)')
       
     } catch (error) {
       console.error('Erro ao carregar processos:', error)
-      message.error('Erro ao carregar processos')
+      // Se for erro 401, não mostrar mensagem de erro - será redirecionado
+      if (error.response?.status !== 401) {
+        message.error('Erro ao carregar processos')
+      }
     } finally {
       setLoading(false)
     }
