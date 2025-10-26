@@ -1,0 +1,328 @@
+/* ===========================================
+   ESTILOS MODERNOS PARA BOTÕES
+   =========================================== */
+
+@font-face {
+  font-family: 'Geist';
+  font-weight: 400;
+  font-style: normal;
+  src: url('https://assets.codepen.io/165585/Geist-Medium.woff2') format('woff2');
+  font-display: swap;
+  font-feature-settings: 'cv11' on;
+}
+
+/* Botão Principal (Primary) */
+.ant-btn-primary {
+  -webkit-tap-highlight-color: transparent !important;
+  appearance: none !important;
+  outline: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%) !important;
+  font: 18px/28px 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #1e3a8a !important;
+  position: relative !important;
+  z-index: 3 !important;
+  text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.8) !important;
+  padding: 12px 24px !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset, 
+              0px 6px 16px -3px rgba(102, 126, 234, 0.8), 
+              0px 12px 24px 0 rgba(102, 126, 234, 0.3) !important;
+  --alternative-gradient-opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  min-height: 48px !important;
+  font-weight: 600 !important;
+}
+
+.ant-btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset, 
+              0px 8px 20px -3px rgba(102, 126, 234, 0.9), 
+              0px 16px 32px 0 rgba(102, 126, 234, 0.4) !important;
+  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #667eea 100%) !important;
+}
+
+.ant-btn-primary:active {
+  transform: translateY(0px) scale(0.98) !important;
+}
+
+.ant-btn-primary::before,
+.ant-btn-primary::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  will-change: transform;
+}
+
+.ant-btn-primary::before {
+  inset: 1px;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, .7) inset;
+  mix-blend-mode: overlay;
+  filter: blur(0.25px);
+  border-radius: 9px;
+  z-index: 1;
+}
+
+.ant-btn-primary::after {
+  border-radius: inherit;
+  inset: 0;
+  opacity: var(--alternative-gradient-opacity);
+  background-image: linear-gradient(96deg, #3b82f6, #1d4ed8);
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset;
+}
+
+.ant-btn-primary .ant-btn-loading-icon {
+  color: white !important;
+}
+
+/* Botão Secundário */
+.ant-btn-default {
+  -webkit-tap-highlight-color: transparent !important;
+  appearance: none !important;
+  outline: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  background-image: linear-gradient(135deg, #2d3748 0%, #4a5568 25%, #718096 50%, #a0aec0 75%, #e2e8f0 100%) !important;
+  font: 16px/26px 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #ffffff !important;
+  position: relative !important;
+  z-index: 3 !important;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5) !important;
+  padding: 10px 20px !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset, 
+              0px 4px 12px -3px rgba(45, 55, 72, 0.7), 
+              0px 8px 20px 0 rgba(45, 55, 72, 0.2) !important;
+  --alternative-gradient-opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  min-height: 44px !important;
+  font-weight: 600 !important;
+}
+
+.ant-btn-default:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset, 
+              0px 6px 16px -3px rgba(45, 55, 72, 0.8), 
+              0px 12px 24px 0 rgba(45, 55, 72, 0.3) !important;
+  background-image: linear-gradient(135deg, #2d3748 0%, #4a5568 20%, #718096 40%, #a0aec0 60%, #e2e8f0 80%, #2d3748 100%) !important;
+}
+
+.ant-btn-default:active {
+  transform: translateY(0px) scale(0.98) !important;
+}
+
+.ant-btn-default::before,
+.ant-btn-default::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  will-change: transform;
+}
+
+.ant-btn-default::before {
+  inset: 1px;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, .5) inset;
+  mix-blend-mode: overlay;
+  filter: blur(0.25px);
+  border-radius: 9px;
+  z-index: 1;
+}
+
+.ant-btn-default::after {
+  border-radius: inherit;
+  inset: 0;
+  opacity: var(--alternative-gradient-opacity);
+  background-image: linear-gradient(96deg, #6b7280, #4b5563);
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset;
+}
+
+/* Botão de Texto */
+.ant-btn-text {
+  -webkit-tap-highlight-color: transparent !important;
+  appearance: none !important;
+  outline: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  background: transparent !important;
+  font: 16px/24px 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #1e40af !important;
+  position: relative !important;
+  z-index: 3 !important;
+  padding: 8px 16px !important;
+  margin: 0 !important;
+  border-radius: 8px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-btn-text:hover {
+  background: rgba(30, 64, 175, 0.1) !important;
+  color: #1d4ed8 !important;
+  transform: translateY(-1px) !important;
+}
+
+.ant-btn-text:active {
+  transform: translateY(0px) scale(0.98) !important;
+}
+
+/* Botão de Link */
+.ant-btn-link {
+  -webkit-tap-highlight-color: transparent !important;
+  appearance: none !important;
+  outline: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  background: transparent !important;
+  font: 16px/24px 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #1e40af !important;
+  position: relative !important;
+  z-index: 3 !important;
+  padding: 4px 8px !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-btn-link:hover {
+  color: #1d4ed8 !important;
+  background: rgba(30, 64, 175, 0.05) !important;
+}
+
+/* Botão de Perigo */
+.ant-btn-dangerous {
+  -webkit-tap-highlight-color: transparent !important;
+  appearance: none !important;
+  outline: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  background-image: linear-gradient(135deg, #dc2626 0%, #ef4444 25%, #f87171 50%, #fca5a5 75%, #fecaca 100%) !important;
+  font: 16px/26px 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #ffffff !important;
+  position: relative !important;
+  z-index: 3 !important;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5) !important;
+  padding: 10px 20px !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset, 
+              0px 4px 12px -3px rgba(220, 38, 38, 0.8), 
+              0px 8px 20px 0 rgba(220, 38, 38, 0.3) !important;
+  --alternative-gradient-opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  min-height: 44px !important;
+  font-weight: 600 !important;
+}
+
+.ant-btn-dangerous:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset, 
+              0px 6px 16px -3px rgba(220, 38, 38, 0.9), 
+              0px 12px 24px 0 rgba(220, 38, 38, 0.4) !important;
+  background-image: linear-gradient(135deg, #dc2626 0%, #ef4444 20%, #f87171 40%, #fca5a5 60%, #fecaca 80%, #dc2626 100%) !important;
+}
+
+.ant-btn-dangerous:active {
+  transform: translateY(0px) scale(0.98) !important;
+}
+
+.ant-btn-dangerous::before,
+.ant-btn-dangerous::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  will-change: transform;
+}
+
+.ant-btn-dangerous::before {
+  inset: 1px;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, .7) inset;
+  mix-blend-mode: overlay;
+  filter: blur(0.25px);
+  border-radius: 9px;
+  z-index: 1;
+}
+
+.ant-btn-dangerous::after {
+  border-radius: inherit;
+  inset: 0;
+  opacity: var(--alternative-gradient-opacity);
+  background-image: linear-gradient(96deg, #f87171, #ef4444);
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset;
+}
+
+/* Efeitos de Glow para Botões */
+.ant-btn-primary.glow-effect {
+  animation: glow-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-pulse {
+  from {
+    box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset, 
+                0px 4px 12px -3px rgba(15, 15, 80, 0.95), 
+                0px 8px 20px 0 rgba(15, 15, 80, 0.2);
+  }
+  to {
+    box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.3) inset, 
+                0px 4px 12px -3px rgba(15, 15, 80, 0.95), 
+                0px 8px 20px 0 rgba(15, 15, 80, 0.4),
+                0px 0px 20px rgba(30, 64, 175, 0.3);
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .ant-btn-primary {
+    font-size: 16px !important;
+    padding: 14px 28px !important;
+    min-height: 52px !important;
+  }
+  
+  .ant-btn-default,
+  .ant-btn-dangerous {
+    font-size: 15px !important;
+    padding: 12px 24px !important;
+    min-height: 48px !important;
+  }
+  
+  .ant-btn-text,
+  .ant-btn-link {
+    font-size: 14px !important;
+    padding: 8px 16px !important;
+    min-height: 40px !important;
+  }
+}
+
+/* Estados de Loading */
+.ant-btn-loading {
+  pointer-events: none !important;
+  opacity: 0.8 !important;
+}
+
+.ant-btn-loading .ant-btn-loading-icon {
+  animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Disabled State */
+.ant-btn:disabled,
+.ant-btn.ant-btn-disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.1) inset !important;
+}
+
+.ant-btn:disabled:hover,
+.ant-btn.ant-btn-disabled:hover {
+  transform: none !important;
+  box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.1) inset !important;
+}

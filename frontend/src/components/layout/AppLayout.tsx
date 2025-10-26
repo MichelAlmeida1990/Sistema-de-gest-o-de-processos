@@ -121,6 +121,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       path: '/search'
     },
     {
+      key: '/funnel',
+      icon: <BarChartOutlined />,
+      label: 'Funil de Processos',
+      path: '/funnel'
+    },
+    {
       key: '/admin',
       icon: <SettingOutlined />,
       label: 'Admin',
@@ -172,13 +178,13 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
   const gradientStyles = {
     header: {
-      background: 'linear-gradient(135deg, rgba(25, 25, 112, 0.85) 0%, rgba(3, 31, 95, 0.75) 100%)',
+      background: 'linear-gradient(135deg, rgba(15, 15, 80, 0.9) 0%, rgba(2, 20, 60, 0.8) 100%)',
       backdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
     },
     sider: {
-      background: 'linear-gradient(135deg, rgba(25, 25, 112, 0.9) 0%, rgba(3, 31, 95, 0.85) 100%)',
+      background: 'linear-gradient(135deg, rgba(15, 15, 80, 0.95) 0%, rgba(2, 20, 60, 0.9) 100%)',
       backdropFilter: 'blur(20px)',
       borderRight: '1px solid rgba(255, 255, 255, 0.2)',
       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
@@ -315,11 +321,13 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         open={mobileDrawerVisible}
         width={280}
         style={{
-          background: 'linear-gradient(135deg, rgba(25, 25, 112, 0.95) 0%, rgba(3, 31, 95, 0.9) 100%)'
+          background: 'linear-gradient(135deg, rgba(15, 15, 80, 0.95) 0%, rgba(2, 20, 60, 0.9) 100%)'
         }}
-        bodyStyle={{
-          padding: 0,
-          background: 'transparent'
+        styles={{
+          body: {
+            padding: 0,
+            background: 'transparent'
+          }
         }}
       >
         <Menu
@@ -375,7 +383,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
           right: 0,
           zIndex: 999,
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          background: 'linear-gradient(135deg, rgba(25, 25, 112, 0.85) 0%, rgba(3, 31, 95, 0.75) 100%)',
+          background: 'linear-gradient(135deg, rgba(15, 15, 80, 0.9) 0%, rgba(2, 20, 60, 0.8) 100%)',
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3)'

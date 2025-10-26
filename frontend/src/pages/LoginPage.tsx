@@ -95,12 +95,23 @@ export function LoginPage() {
 
       const data = await response.json()
       
+      console.log('🎉 Login realizado com sucesso!')
+      console.log('🔑 Token recebido:', data.access_token ? 'SIM' : 'NÃO')
+      console.log('👤 Usuário recebido:', data.user ? 'SIM' : 'NÃO')
+      
       // Login direto (sem 2FA)
       localStorage.setItem('token', data.access_token)
       localStorage.setItem('user', JSON.stringify(data.user))
       
+      console.log('💾 Token salvo no localStorage:', localStorage.getItem('token') ? 'SIM' : 'NÃO')
+      console.log('💾 Usuário salvo no localStorage:', localStorage.getItem('user') ? 'SIM' : 'NÃO')
+      
       message.success('Login realizado com sucesso!')
+      
+      console.log('🔄 Navegando para dashboard...')
       navigate('/dashboard')
+      
+      console.log('🔄 Recarregando página...')
       window.location.reload() // Recarregar para atualizar o contexto
       
     } catch (error: any) {
@@ -134,7 +145,7 @@ export function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-             background: 'linear-gradient(135deg, rgba(135, 206, 235, 0.9) 0%, rgba(100, 149, 237, 0.8) 100%)',
+             background: 'linear-gradient(135deg, rgba(25, 25, 112, 0.9) 0%, rgba(3, 31, 95, 0.85) 100%)',
         padding: '20px'
       }}>
         <Card 
@@ -193,6 +204,10 @@ export function LoginPage() {
                   loading={loading} 
                   size="large" 
                   block
+                  style={{
+                    color: '#1a1a1a',
+                    fontWeight: '600'
+                  }}
                 >
                   Entrar
                 </Button>
@@ -210,7 +225,7 @@ export function LoginPage() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-             background: 'linear-gradient(135deg, rgba(135, 206, 235, 0.9) 0%, rgba(100, 149, 237, 0.8) 100%)',
+             background: 'linear-gradient(135deg, rgba(25, 25, 112, 0.9) 0%, rgba(3, 31, 95, 0.85) 100%)',
       padding: '20px'
     }}>
       <Card 
@@ -268,7 +283,9 @@ export function LoginPage() {
               style={{ 
                 width: '100%',
                 height: 45,
-                fontSize: 16
+                fontSize: 16,
+                color: '#1a1a1a',
+                fontWeight: '600'
               }}
             >
               Entrar no Sistema
