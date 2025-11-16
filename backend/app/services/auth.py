@@ -31,7 +31,12 @@ from app.schemas.user import UserCreate, UserLogin
 from app.schemas.auth import Token, TokenData, LoginResponse, TwoFactorSetup
 
 # Contexto de criptografia para senhas
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Evita erro quando senha ultrapassa 72 bytes (bcrypt trunca com segurança)
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__truncate_error=False
+)
 
 class AuthService:
     """Serviço de autenticação e autorização."""
@@ -73,29 +78,60 @@ class AuthService:
     def verify_token(token: str, token_type: str = "access") -> TokenData:
         """Verificar e decodificar token JWT."""
         try:
+            import logging
+            logger = logging.getLogger(__name__)
+            
+            logger.info(f"🔍 Verificando token (tipo: {token_type})...")
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            logger.info(f"✅ Token decodificado. Payload: {payload}")
             
             if payload.get("type") != token_type:
+                logger.error(f"❌ Tipo de token incorreto. Esperado: {token_type}, Recebido: {payload.get('type')}")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Tipo de token inválido"
                 )
             
-            user_id: int = payload.get("sub")
-            email: str = payload.get("email")
+            user_id_str = payload.get("sub")
+            email = payload.get("email")
             
-            if user_id is None or email is None:
+            logger.info(f"🔍 user_id (sub): {user_id_str} (tipo: {type(user_id_str)}), email: {email}")
+            
+            if user_id_str is None or email is None:
+                logger.error(f"❌ Token inválido: user_id={user_id_str}, email={email}")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Token inválido"
+                    detail="Token inválido - user_id ou email não encontrado"
                 )
             
-            return TokenData(user_id=user_id, email=email, exp=payload.get("exp"))
+            # Converter user_id de string para int (jose JWT usa string para 'sub')
+            try:
+                user_id = int(user_id_str)
+            except (ValueError, TypeError):
+                logger.error(f"❌ user_id não é um número válido: {user_id_str}")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token inválido - user_id inválido"
+                )
             
-        except JWTError:
+            logger.info(f"✅ Token válido! user_id: {user_id}, email: {email}")
+            return TokenData(user_id=user_id, email=str(email), exp=payload.get("exp"))
+            
+        except JWTError as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"❌ Erro JWT ao verificar token: {e}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token inválido"
+                detail=f"Token inválido: {str(e)}"
+            )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"❌ Erro inesperado ao verificar token: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Erro ao verificar token: {str(e)}"
             )
     
     @staticmethod
@@ -141,11 +177,12 @@ class AuthService:
                 )
         
         # Criar tokens
+        # O campo 'sub' deve ser string para a biblioteca jose JWT
         access_token = AuthService.create_access_token(
-            data={"sub": user.id, "email": user.email}
+            data={"sub": str(user.id), "email": user.email}
         )
         refresh_token = AuthService.create_refresh_token(
-            data={"sub": user.id, "email": user.email}
+            data={"sub": str(user.id), "email": user.email}
         )
         
         # Atualizar último login
