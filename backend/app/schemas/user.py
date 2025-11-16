@@ -70,6 +70,8 @@ class UserProfile(BaseModel):
     updated_at: datetime
 
     class Config:
+        # Necessário para usar UserProfile.from_orm(user) em ambientes com Pydantic 1.x
+        orm_mode = True
         from_attributes = True
 
 class UserResponse(BaseModel):
@@ -93,6 +95,7 @@ class UserResponse(BaseModel):
     updated_at: datetime
 
     class Config:
+        orm_mode = True
         from_attributes = True
 
 class UserChangePassword(BaseModel):
