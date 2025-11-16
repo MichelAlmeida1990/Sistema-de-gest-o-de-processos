@@ -31,11 +31,11 @@ from app.schemas.user import UserCreate, UserLogin
 from app.schemas.auth import Token, TokenData, LoginResponse, TwoFactorSetup
 
 # Contexto de criptografia para senhas
-# Evita erro quando senha ultrapassa 72 bytes (bcrypt trunca com segurança)
+# Usa PBKDF2 como padrão (sem limite de 72 bytes) e mantém compatibilidade com hashes bcrypt existentes.
 pwd_context = CryptContext(
-    schemes=["bcrypt"],
+    schemes=["pbkdf2_sha256", "bcrypt"],
     deprecated="auto",
-    bcrypt__truncate_error=False
+    bcrypt__truncate_error=False  # compat para verificar/gerar bcrypt sem levantar erro
 )
 
 class AuthService:
