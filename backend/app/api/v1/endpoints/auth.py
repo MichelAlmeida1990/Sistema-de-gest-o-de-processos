@@ -13,7 +13,7 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
 from app.schemas.auth import LoginResponse, RefreshTokenRequest, TwoFactorVerify
-from app.schemas.user import UserCreate, UserLogin
+from app.schemas.user import UserCreate, UserLogin, UserProfile
 from app.services.auth import AuthService
 from app.models.user import User
 
@@ -59,8 +59,9 @@ async def login(
             )
         
         # Criar token sem validar senha
-        access_token = AuthService.create_access_token(data={"sub": user.email})
-        refresh_token = AuthService.create_refresh_token(data={"sub": user.email})
+        # O campo 'sub' deve ser string para a biblioteca jose JWT
+        access_token = AuthService.create_access_token(data={"sub": str(user.id), "email": user.email})
+        refresh_token = AuthService.create_refresh_token(data={"sub": str(user.id), "email": user.email})
         
         from app.schemas.auth import Token
         
@@ -71,11 +72,9 @@ async def login(
             expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
         )
         
-        return LoginResponse(
-            user=user,
-            token=token,
-            requires_2fa=False
-        )
+        # Converter usuário ORM para schema Pydantic
+        user_profile = UserProfile.from_orm(user)
+        return LoginResponse(user=user_profile, token=token, requires_2fa=False)
         
     except HTTPException:
         raise
@@ -187,8 +186,9 @@ async def refresh_token(
             )
         
         # Criar novo access token
+        # O campo 'sub' deve ser string para a biblioteca jose JWT
         access_token = AuthService.create_access_token(
-            data={"sub": user.id, "email": user.email}
+            data={"sub": str(user.id), "email": user.email}
         )
         
         return {
