@@ -15,9 +15,12 @@ import { KanbanPage } from './pages/KanbanPage'
 import { TimelinePage } from './pages/TimelinePage'
 import { FileManagerPage } from './pages/FileManagerPage'
 import { ReportsPage } from './pages/ReportsPage'
+import { PrecatoriosPage } from './pages/PrecatoriosPage'
 import { AdminPage } from './pages/AdminPage'
 import { NotificationsPage } from './pages/NotificationsPage'
 import { SearchPage } from './pages/SearchPage'
+import { FunnelPage } from './pages/FunnelPage'
+import { RDStationPage } from './pages/RDStationPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 // Componentes de Layout
@@ -32,8 +35,19 @@ function AppContent() {
     return <LoadingSpinner />
   }
 
-  // Em mobile, pular autenticação e mostrar aplicação diretamente
+  // Em mobile, mostrar login se não autenticado, senão mostrar app
   if (mobile) {
+    // Se não estiver autenticado, mostrar página de login
+    if (!user) {
+      return (
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      )
+    }
+    
+    // Se estiver autenticado, mostrar aplicação
     return (
       <AppLayout>
         <Routes>
@@ -50,6 +64,8 @@ function AppContent() {
           <Route path="/financial" element={<FinancialPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/funnel" element={<FunnelPage />} />
+          <Route path="/rdstation" element={<RDStationPage />} />
           <Route path="/admin" element={<AdminPage />} />
           
           {/* Rota de fallback */}
@@ -87,10 +103,13 @@ function AppContent() {
         <Route path="/timeline" element={<TimelinePage />} />
         <Route path="/files" element={<FileManagerPage />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/precatorios" element={<PrecatoriosPage />} />
+        <Route path="/precatorios" element={<PrecatoriosPage />} />
         <Route path="/deliveries" element={<DeliveriesPage />} />
         <Route path="/financial" element={<FinancialPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/funnel" element={<FunnelPage />} />
         <Route path="/admin" element={<AdminPage />} />
         
         {/* Rota de fallback */}

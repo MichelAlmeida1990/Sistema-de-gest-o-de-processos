@@ -9,6 +9,7 @@ from .file import File
 from .timeline import TimelineEvent
 from .notification import Notification
 from .audit import AuditLog
+from .precatorio import Precatorio
 
 __all__ = [
     "User",
@@ -17,6 +18,7 @@ __all__ = [
     "File",
     "TimelineEvent",
     "Notification",
-    "AuditLog"
+    "AuditLog",
+    "Precatorio",
 ]
 

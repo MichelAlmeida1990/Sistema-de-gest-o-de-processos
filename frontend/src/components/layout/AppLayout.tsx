@@ -17,6 +17,7 @@ import {
   ClockCircleOutlined,
   FolderOutlined,
   BarChartOutlined,
+  ApiOutlined,
   BulbOutlined,
   BulbFilled
 } from '@ant-design/icons'
@@ -96,6 +97,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       label: 'Relatórios',
       path: '/reports'
     },
+  {
+      key: '/precatorios',
+      icon: <DollarOutlined />,
+      label: 'Precatórios',
+      path: '/precatorios'
+  },
     {
       key: '/deliveries',
       icon: <SendOutlined />,
@@ -125,6 +132,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       icon: <BarChartOutlined />,
       label: 'Funil de Processos',
       path: '/funnel'
+    },
+    {
+      key: '/rdstation',
+      icon: <ApiOutlined />,
+      label: 'RD Station',
+      path: '/rdstation'
     },
     {
       key: '/admin',

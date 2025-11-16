@@ -10,6 +10,12 @@ from .timeline import TimelineEventResponse, TimelineEventList
 from .notification import NotificationResponse, NotificationList
 from .auth import Token, TokenData, LoginResponse
 from .common import MessageResponse, PaginatedResponse
+from .precatorio import (
+    PrecatorioCreate,
+    PrecatorioUpdate,
+    PrecatorioResponse,
+    PrecatorioList,
+)
 
 __all__ = [
     # User schemas
@@ -51,7 +57,13 @@ __all__ = [
     
     # Common schemas
     "MessageResponse",
-    "PaginatedResponse"
+    "PaginatedResponse",
+
+    # Precatorio
+    "PrecatorioCreate",
+    "PrecatorioUpdate",
+    "PrecatorioResponse",
+    "PrecatorioList",
 ]
 
 
