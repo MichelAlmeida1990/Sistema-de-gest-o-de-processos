@@ -125,25 +125,44 @@ async def startup_event():
         db = SessionLocal()
         try:
             # Verificar se admin já existe
-            admin_user = db.query(User).filter(User.email == "admin@gestorjuridico.com").first()
+            from app.models.user import UserRole
+            admin_user = db.query(User).filter(User.email == "admin@sistema.com").first()
             
             if not admin_user:
                 # Criar usuário admin
                 admin_user = User(
-                    email="admin@gestorjuridico.com",
+                    email="admin@sistema.com",
                     username="admin",
                     full_name="Administrador",
                     hashed_password=AuthService.get_password_hash("123456"),
                     is_active=True,
                     is_verified=True,
-                    role="admin"
+                    role=UserRole.ADMIN
                 )
                 db.add(admin_user)
                 db.commit()
                 logger.info("✅ Usuário admin criado automaticamente")
             else:
                 logger.info("✅ Usuário admin já existe")
-                
+            
+            # Criar usuário DEMO para testes públicos (não-admin)
+            demo_user = db.query(User).filter(User.email == "demo@demo.com").first()
+            if not demo_user:
+                demo_user = User(
+                    email="demo@demo.com",
+                    username="demo",
+                    full_name="Usuário Demo",
+                    hashed_password=AuthService.get_password_hash("demo123"),
+                    is_active=True,
+                    is_verified=True,
+                    role=UserRole.ASSISTANT  # perfil sem permissões administrativas
+                )
+                db.add(demo_user)
+                db.commit()
+                logger.info("✅ Usuário DEMO criado (demo@demo.com / demo123)")
+            else:
+                logger.info("✅ Usuário DEMO já existe")
+            
         except Exception as e:
             logger.error(f"❌ Erro ao criar usuário admin: {e}")
         finally:

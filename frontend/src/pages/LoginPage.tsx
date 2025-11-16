@@ -20,6 +20,31 @@ export function LoginPage() {
   const { login, loginWithToken } = useAuth()
   const navigate = useNavigate()
 
+  const handleDemoLogin = async () => {
+    setLoading(true)
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+      const demoCredentials = { email: 'demo@demo.com', password: 'demo123' }
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(demoCredentials),
+      })
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ detail: 'Erro no login demo' }))
+        throw new Error(err.detail || 'Erro no login demo')
+      }
+      const data = await response.json()
+      const accessToken = data.token?.access_token || data.access_token
+      await loginWithToken(accessToken, data.user)
+      navigate('/dashboard')
+    } catch (e: any) {
+      message.error(e.message || 'Falha ao entrar como demo')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Login automático para mobile
   useEffect(() => {
     if (isMobile()) {
@@ -51,7 +76,9 @@ export function LoginPage() {
 
       if (response.ok) {
         const data = await response.json()
-        await loginWithToken(data.access_token, data.user)
+        // Backend retorna: { user: {...}, token: { access_token: "...", ... } }
+        const accessToken = data.token?.access_token || data.access_token
+        await loginWithToken(accessToken, data.user)
         navigate('/dashboard')
       } else {
         const errorData = await response.json().catch(() => ({ detail: 'Erro desconhecido' }))
@@ -72,7 +99,8 @@ export function LoginPage() {
     
     try {
       // Tentar login inicial
-      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,15 +124,38 @@ export function LoginPage() {
       const data = await response.json()
       
       console.log('🎉 Login realizado com sucesso!')
-      console.log('🔑 Token recebido:', data.access_token ? 'SIM' : 'NÃO')
-      console.log('👤 Usuário recebido:', data.user ? 'SIM' : 'NÃO')
+      console.log('📦 Dados recebidos completos:', data)
+      console.log('🔑 Estrutura do token:', data.token)
+      console.log('👤 Dados do usuário:', data.user)
       
-      // Login direto (sem 2FA)
-      localStorage.setItem('token', data.access_token)
+      // Validar estrutura da resposta
+      if (!data.token || !data.token.access_token) {
+        console.error('❌ Estrutura de resposta inválida:', data)
+        throw new Error('Token não encontrado na resposta do servidor')
+      }
+      
+      if (!data.user) {
+        console.error('❌ Dados do usuário não encontrados:', data)
+        throw new Error('Dados do usuário não encontrados')
+      }
+      
+      // Extrair o token correto
+      const accessToken = data.token.access_token
+      console.log('✅ Token extraído:', accessToken.substring(0, 20) + '...')
+      
+      // Salvar usando o formato correto
+      localStorage.setItem('token', accessToken)
       localStorage.setItem('user', JSON.stringify(data.user))
       
-      console.log('💾 Token salvo no localStorage:', localStorage.getItem('token') ? 'SIM' : 'NÃO')
+      // Verificar se foi salvo
+      const savedToken = localStorage.getItem('token')
+      console.log('💾 Token salvo no localStorage:', savedToken?.substring(0, 20) + '...')
       console.log('💾 Usuário salvo no localStorage:', localStorage.getItem('user') ? 'SIM' : 'NÃO')
+      
+      if (!savedToken || savedToken === 'undefined') {
+        console.error('❌ Erro ao salvar token')
+        throw new Error('Erro ao salvar credenciais')
+      }
       
       message.success('Login realizado com sucesso!')
       
@@ -242,6 +293,25 @@ export function LoginPage() {
           <Text type="secondary">
             Acesse sua conta para continuar
           </Text>
+          <br />
+          <Button 
+            size="small" 
+            danger
+            type="link"
+            onClick={() => {
+              console.log('🧹 Limpando localStorage e tokens antigos...')
+              // Limpar tokens e dados de autenticação
+              localStorage.removeItem('token')
+              localStorage.removeItem('user')
+              // Limpar todo o resto
+              localStorage.clear()
+              message.success('Cache limpo! Faça login novamente para obter um novo token válido.')
+              setTimeout(() => window.location.reload(), 1000)
+            }}
+            style={{ marginTop: 8, fontSize: '11px' }}
+          >
+            🗑️ Limpar Cache e Recarregar
+          </Button>
         </div>
 
         <Form
@@ -289,6 +359,19 @@ export function LoginPage() {
               }}
             >
               Entrar no Sistema
+            </Button>
+          </Form.Item>
+          
+          <Form.Item>
+            <Button 
+              onClick={handleDemoLogin}
+              disabled={loading}
+              style={{ 
+                width: '100%',
+                height: 40
+              }}
+            >
+              Entrar como Demo
             </Button>
           </Form.Item>
         </Form>
