@@ -4,7 +4,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud, funnel, financial, dashboard
+from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud, funnel, financial, dashboard, reports_export, rdstation, precatorios, indices_economicos
 
 # ===========================================
 # ROUTER PRINCIPAL
@@ -35,6 +35,13 @@ api_router.include_router(
     processes.router,
     prefix="/processes",
     tags=["Processos"]
+)
+
+# Precatórios
+api_router.include_router(
+    precatorios.router,
+    prefix="/precatorios",
+    tags=["Precatórios"]
 )
 
 # Tarefas
@@ -70,6 +77,13 @@ api_router.include_router(
     reports.router,
     prefix="/reports",
     tags=["Relatórios"]
+)
+
+# Exportação de Relatórios
+api_router.include_router(
+    reports_export.router,
+    prefix="/reports",
+    tags=["Exportação de Relatórios"]
 )
 
 # WebSocket
@@ -112,6 +126,20 @@ api_router.include_router(
     dashboard.router,
     prefix="/dashboard",
     tags=["Dashboard"]
+)
+
+# RD Station
+api_router.include_router(
+    rdstation.router,
+    prefix="/rdstation",
+    tags=["RD Station"]
+)
+
+# Índices Econômicos (Banco Central)
+api_router.include_router(
+    indices_economicos.router,
+    prefix="/indices-economicos",
+    tags=["Índices Econômicos"]
 )
 
 # Relatórios PDF - TEMPORARIAMENTE DESABILITADO

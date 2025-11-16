@@ -63,9 +63,32 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # ===========================================
 
 # CORS
+# Preparar origens permitidas
+allowed_origins = settings.ALLOWED_HOSTS.copy() if isinstance(settings.ALLOWED_HOSTS, list) else list(settings.ALLOWED_HOSTS)
+
+# Se ALLOWED_HOSTS contém "*", permitir todas as origens (incluindo localhost)
+if "*" in allowed_origins:
+    allowed_origins = ["*"]
+    logger.info("CORS: Permitindo todas as origens (*)")
+else:
+    # Sempre adicionar localhost em desenvolvimento ou se não estiver na lista
+    localhost_origins = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
+    ]
+    # Adicionar localhost se não estiver na lista
+    for origin in localhost_origins:
+        if origin not in allowed_origins:
+            allowed_origins.append(origin)
+    logger.info(f"CORS: Origens permitidas: {allowed_origins}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_HOSTS,
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
