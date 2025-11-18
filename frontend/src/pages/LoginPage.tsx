@@ -56,7 +56,7 @@ export function LoginPage() {
       email: DEMO_EMAIL,
       password: DEMO_PASSWORD
     })
-    message.success('Credenciais do demo preenchidas! Clique em "Entrar no Sistema"')
+    // Mensagem removida conforme solicitado
   }
 
   const copyCredentials = async (text: string) => {
@@ -88,17 +88,14 @@ export function LoginPage() {
       const successful = document.execCommand('copy')
       document.body.removeChild(textArea)
       
-      if (successful) {
-        message.success('Copiado para a área de transferência!', 2)
-      } else {
+      if (!successful) {
         // Se execCommand falhar, tentar Clipboard API como fallback
         if (navigator.clipboard && document.hasFocus()) {
           try {
             await navigator.clipboard.writeText(text)
-            message.success('Copiado para a área de transferência!', 2)
+            // Copiado com sucesso, sem mensagem
           } catch (clipboardError) {
-            console.error('Erro ao copiar:', clipboardError)
-            message.warning('Não foi possível copiar automaticamente. O texto está selecionado para você copiar manualmente.')
+            // Erro silencioso - não mostrar mensagem
             // Tentar selecionar o texto no campo visível
             const emailInput = document.querySelector('input[placeholder*="demo@demo.com"]') as HTMLInputElement
             if (emailInput && text === DEMO_EMAIL) {
@@ -106,13 +103,11 @@ export function LoginPage() {
               emailInput.select()
             }
           }
-        } else {
-          message.warning('Não foi possível copiar automaticamente. Tente selecionar e copiar manualmente.')
         }
       }
+      // Copiado com sucesso, sem mensagem
     } catch (error: any) {
-      console.error('Erro ao copiar:', error)
-      message.error('Não foi possível copiar. Tente selecionar e copiar manualmente.')
+      // Erro silencioso - não mostrar mensagem nem console
     } finally {
       // Resetar estado após um pequeno delay para evitar cliques rápidos
       setTimeout(() => {
