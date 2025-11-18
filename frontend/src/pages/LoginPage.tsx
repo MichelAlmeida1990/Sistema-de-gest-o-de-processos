@@ -68,77 +68,51 @@ export function LoginPage() {
     setCopying(true)
     
     try {
-      // Verificar se Clipboard API está disponível
-      if (!navigator.clipboard) {
-        // Fallback para navegadores mais antigos
-        const textArea = document.createElement('textarea')
-        textArea.value = text
-        textArea.style.position = 'fixed'
-        textArea.style.left = '-999999px'
-        textArea.style.top = '0'
-        textArea.setAttribute('readonly', '')
-        document.body.appendChild(textArea)
-        textArea.focus()
-        textArea.select()
-        const successful = document.execCommand('copy')
-        document.body.removeChild(textArea)
-        
-        if (successful) {
-          message.success('Copiado para a área de transferência!')
-        } else {
-          throw new Error('Falha ao copiar')
-        }
-        return
-      }
-
-      // Usar Clipboard API moderna com verificação de permissão
-      if (document.hasFocus()) {
-        await navigator.clipboard.writeText(text)
-        message.success('Copiado para a área de transferência!')
+      // Usar método que não requer permissão explícita
+      // Criar elemento textarea temporário
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '0'
+      textArea.style.opacity = '0'
+      textArea.setAttribute('readonly', '')
+      textArea.setAttribute('aria-hidden', 'true')
+      
+      document.body.appendChild(textArea)
+      
+      // Selecionar e copiar
+      textArea.select()
+      textArea.setSelectionRange(0, text.length) // Para mobile
+      
+      const successful = document.execCommand('copy')
+      document.body.removeChild(textArea)
+      
+      if (successful) {
+        message.success('Copiado para a área de transferência!', 2)
       } else {
-        // Se o documento não estiver focado, usar método alternativo
-        const textArea = document.createElement('textarea')
-        textArea.value = text
-        textArea.style.position = 'fixed'
-        textArea.style.left = '-999999px'
-        textArea.style.top = '0'
-        textArea.setAttribute('readonly', '')
-        document.body.appendChild(textArea)
-        textArea.focus()
-        textArea.select()
-        const successful = document.execCommand('copy')
-        document.body.removeChild(textArea)
-        
-        if (successful) {
-          message.success('Copiado para a área de transferência!')
+        // Se execCommand falhar, tentar Clipboard API como fallback
+        if (navigator.clipboard && document.hasFocus()) {
+          try {
+            await navigator.clipboard.writeText(text)
+            message.success('Copiado para a área de transferência!', 2)
+          } catch (clipboardError) {
+            console.error('Erro ao copiar:', clipboardError)
+            message.warning('Não foi possível copiar automaticamente. O texto está selecionado para você copiar manualmente.')
+            // Tentar selecionar o texto no campo visível
+            const emailInput = document.querySelector('input[placeholder*="demo@demo.com"]') as HTMLInputElement
+            if (emailInput && text === DEMO_EMAIL) {
+              emailInput.focus()
+              emailInput.select()
+            }
+          }
         } else {
-          throw new Error('Falha ao copiar')
+          message.warning('Não foi possível copiar automaticamente. Tente selecionar e copiar manualmente.')
         }
       }
     } catch (error: any) {
-      // Se falhar, tentar método alternativo
-      try {
-        const textArea = document.createElement('textarea')
-        textArea.value = text
-        textArea.style.position = 'fixed'
-        textArea.style.left = '-999999px'
-        textArea.style.top = '0'
-        textArea.setAttribute('readonly', '')
-        document.body.appendChild(textArea)
-        textArea.focus()
-        textArea.select()
-        const successful = document.execCommand('copy')
-        document.body.removeChild(textArea)
-        
-        if (successful) {
-          message.success('Copiado para a área de transferência!')
-        } else {
-          throw new Error('Falha ao copiar')
-        }
-      } catch (fallbackError) {
-        console.error('Erro ao copiar:', fallbackError)
-        message.error('Não foi possível copiar. Tente selecionar e copiar manualmente.')
-      }
+      console.error('Erro ao copiar:', error)
+      message.error('Não foi possível copiar. Tente selecionar e copiar manualmente.')
     } finally {
       // Resetar estado após um pequeno delay para evitar cliques rápidos
       setTimeout(() => {
