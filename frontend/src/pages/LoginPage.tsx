@@ -17,6 +17,7 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [show2FA, setShow2FA] = useState(false)
   const [loginCredentials, setLoginCredentials] = useState<LoginForm | null>(null)
+  const [copying, setCopying] = useState(false)
   const [form] = Form.useForm()
   const [mobileForm] = Form.useForm()
   const { login, loginWithToken } = useAuth()
@@ -58,9 +59,92 @@ export function LoginPage() {
     message.success('Credenciais do demo preenchidas! Clique em "Entrar no Sistema"')
   }
 
-  const copyCredentials = (text: string) => {
-    navigator.clipboard.writeText(text)
-    message.success('Copiado para a área de transferência!')
+  const copyCredentials = async (text: string) => {
+    // Prevenir múltiplos cliques simultâneos
+    if (copying) {
+      return
+    }
+
+    setCopying(true)
+    
+    try {
+      // Verificar se Clipboard API está disponível
+      if (!navigator.clipboard) {
+        // Fallback para navegadores mais antigos
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '0'
+        textArea.setAttribute('readonly', '')
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textArea)
+        
+        if (successful) {
+          message.success('Copiado para a área de transferência!')
+        } else {
+          throw new Error('Falha ao copiar')
+        }
+        return
+      }
+
+      // Usar Clipboard API moderna com verificação de permissão
+      if (document.hasFocus()) {
+        await navigator.clipboard.writeText(text)
+        message.success('Copiado para a área de transferência!')
+      } else {
+        // Se o documento não estiver focado, usar método alternativo
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '0'
+        textArea.setAttribute('readonly', '')
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textArea)
+        
+        if (successful) {
+          message.success('Copiado para a área de transferência!')
+        } else {
+          throw new Error('Falha ao copiar')
+        }
+      }
+    } catch (error: any) {
+      // Se falhar, tentar método alternativo
+      try {
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '0'
+        textArea.setAttribute('readonly', '')
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textArea)
+        
+        if (successful) {
+          message.success('Copiado para a área de transferência!')
+        } else {
+          throw new Error('Falha ao copiar')
+        }
+      } catch (fallbackError) {
+        console.error('Erro ao copiar:', fallbackError)
+        message.error('Não foi possível copiar. Tente selecionar e copiar manualmente.')
+      }
+    } finally {
+      // Resetar estado após um pequeno delay para evitar cliques rápidos
+      setTimeout(() => {
+        setCopying(false)
+      }, 500)
+    }
   }
 
   // Login automático para mobile
