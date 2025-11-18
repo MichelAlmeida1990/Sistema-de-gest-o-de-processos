@@ -104,12 +104,12 @@ function AppContent() {
         <Route path="/files" element={<FileManagerPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/precatorios" element={<PrecatoriosPage />} />
-        <Route path="/precatorios" element={<PrecatoriosPage />} />
         <Route path="/deliveries" element={<DeliveriesPage />} />
         <Route path="/financial" element={<FinancialPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/funnel" element={<FunnelPage />} />
+        <Route path="/rdstation" element={<RDStationPage />} />
         <Route path="/admin" element={<AdminPage />} />
         
         {/* Rota de fallback */}
