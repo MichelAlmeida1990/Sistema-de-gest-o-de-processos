@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Input, Button, Card, Typography, message } from 'antd'
-import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import { Form, Input, Button, Card, Typography, message, Alert, Space } from 'antd'
+import { UserOutlined, LockOutlined, CopyOutlined, LoginOutlined } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { TwoFactorLogin } from '../components/TwoFactorLogin'
@@ -17,14 +17,19 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [show2FA, setShow2FA] = useState(false)
   const [loginCredentials, setLoginCredentials] = useState<LoginForm | null>(null)
+  const [form] = Form.useForm()
+  const [mobileForm] = Form.useForm()
   const { login, loginWithToken } = useAuth()
   const navigate = useNavigate()
+
+  const DEMO_EMAIL = 'demo@demo.com'
+  const DEMO_PASSWORD = 'demo123'
 
   const handleDemoLogin = async () => {
     setLoading(true)
     try {
       const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
-      const demoCredentials = { email: 'demo@demo.com', password: 'demo123' }
+      const demoCredentials = { email: DEMO_EMAIL, password: DEMO_PASSWORD }
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,6 +48,19 @@ export function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const fillDemoCredentials = () => {
+    form.setFieldsValue({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD
+    })
+    message.success('Credenciais do demo preenchidas! Clique em "Entrar no Sistema"')
+  }
+
+  const copyCredentials = (text: string) => {
+    navigator.clipboard.writeText(text)
+    message.success('Copiado para a área de transferência!')
   }
 
   // Login automático para mobile
@@ -210,60 +228,99 @@ export function LoginPage() {
           <Title level={2} style={{ color: '#1890ff', marginBottom: 8 }}>
             Sistema de Gestão
           </Title>
-          <Text type="secondary" style={{ marginBottom: 32 }}>
-            {loading ? 'Login automático em andamento...' : 'Login automático falhou - use o formulário abaixo'}
+          <Text type="secondary" style={{ marginBottom: 16 }}>
+            {loading ? 'Login automático em andamento...' : 'Acesse sua conta'}
           </Text>
+
+          {/* Credenciais Demo Mobile */}
+          {!loading && (
+            <Alert
+              message="🧪 Demo: demo@demo.com / demo123"
+              type="info"
+              showIcon
+              style={{ marginBottom: 16, fontSize: 12 }}
+              action={
+                <Button
+                  size="small"
+                  type="text"
+                  onClick={() => {
+                    mobileForm.setFieldsValue({
+                      email: DEMO_EMAIL,
+                      password: DEMO_PASSWORD
+                    })
+                    message.success('Credenciais preenchidas!')
+                  }}
+                >
+                  Preencher
+                </Button>
+              }
+            />
+          )}
           
           {loading ? (
             <Button type="primary" loading={true} size="large" block>
               Conectando...
             </Button>
           ) : (
-            <Form
-              name="mobile-login"
-              onFinish={onFinish}
-              autoComplete="off"
-              size="large"
-            >
-              <Form.Item
-                name="email"
-                rules={[
-                  { required: true, message: 'Por favor, digite seu email!' },
-                  { type: 'email', message: 'Digite um email válido!' }
-                ]}
+            <>
+              <Form
+                form={mobileForm}
+                name="mobile-login"
+                onFinish={onFinish}
+                autoComplete="off"
+                size="large"
               >
-                <Input 
-                  prefix={<UserOutlined />} 
-                  placeholder="Digite seu email" 
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="password"
-                rules={[{ required: true, message: 'Por favor, digite sua senha!' }]}
-              >
-                <Input.Password 
-                  prefix={<LockOutlined />} 
-                  placeholder="Digite sua senha" 
-                />
-              </Form.Item>
-
-              <Form.Item>
-                <Button 
-                  type="primary" 
-                  htmlType="submit" 
-                  loading={loading} 
-                  size="large" 
-                  block
-                  style={{
-                    color: '#1a1a1a',
-                    fontWeight: '600'
-                  }}
+                <Form.Item
+                  name="email"
+                  rules={[
+                    { required: true, message: 'Por favor, digite seu email!' },
+                    { type: 'email', message: 'Digite um email válido!' }
+                  ]}
                 >
-                  Entrar
-                </Button>
-              </Form.Item>
-            </Form>
+                  <Input 
+                    prefix={<UserOutlined />} 
+                    placeholder={`Email (ex: ${DEMO_EMAIL})`}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="password"
+                  rules={[{ required: true, message: 'Por favor, digite sua senha!' }]}
+                >
+                  <Input.Password 
+                    prefix={<LockOutlined />} 
+                    placeholder={`Senha (ex: ${DEMO_PASSWORD})`}
+                  />
+                </Form.Item>
+
+                <Form.Item>
+                  <Button 
+                    type="primary" 
+                    htmlType="submit" 
+                    loading={loading} 
+                    size="large" 
+                    block
+                    style={{
+                      color: '#1a1a1a',
+                      fontWeight: '600'
+                    }}
+                  >
+                    Entrar
+                  </Button>
+                </Form.Item>
+              </Form>
+              <Button 
+                onClick={handleDemoLogin}
+                disabled={loading}
+                type="default"
+                icon={<LoginOutlined />}
+                size="large"
+                block
+                style={{ marginTop: 8 }}
+              >
+                Login Demo Rápido
+              </Button>
+            </>
           )}
         </Card>
       </div>
@@ -293,28 +350,56 @@ export function LoginPage() {
           <Text type="secondary">
             Acesse sua conta para continuar
           </Text>
-          <br />
-          <Button 
-            size="small" 
-            danger
-            type="link"
-            onClick={() => {
-              console.log('🧹 Limpando localStorage e tokens antigos...')
-              // Limpar tokens e dados de autenticação
-              localStorage.removeItem('token')
-              localStorage.removeItem('user')
-              // Limpar todo o resto
-              localStorage.clear()
-              message.success('Cache limpo! Faça login novamente para obter um novo token válido.')
-              setTimeout(() => window.location.reload(), 1000)
-            }}
-            style={{ marginTop: 8, fontSize: '11px' }}
-          >
-            🗑️ Limpar Cache e Recarregar
-          </Button>
         </div>
 
+        {/* Card de Credenciais Demo */}
+        <Alert
+          message="🧪 Conta Demo para Testes"
+          description={
+            <div style={{ marginTop: 8 }}>
+              <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <div>
+                  <Text strong>Email: </Text>
+                  <Text code style={{ fontSize: 13 }}>{DEMO_EMAIL}</Text>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<CopyOutlined />}
+                    onClick={() => copyCredentials(DEMO_EMAIL)}
+                    style={{ marginLeft: 4 }}
+                  />
+                </div>
+                <div>
+                  <Text strong>Senha: </Text>
+                  <Text code style={{ fontSize: 13 }}>{DEMO_PASSWORD}</Text>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<CopyOutlined />}
+                    onClick={() => copyCredentials(DEMO_PASSWORD)}
+                    style={{ marginLeft: 4 }}
+                  />
+                </div>
+                <Button
+                  type="dashed"
+                  size="small"
+                  icon={<LoginOutlined />}
+                  onClick={fillDemoCredentials}
+                  block
+                  style={{ marginTop: 8 }}
+                >
+                  Preencher Credenciais Demo
+                </Button>
+              </Space>
+            </div>
+          }
+          type="info"
+          showIcon
+          style={{ marginBottom: 24 }}
+        />
+
         <Form
+          form={form}
           name="login"
           onFinish={onFinish}
           autoComplete="off"
@@ -329,7 +414,7 @@ export function LoginPage() {
           >
             <Input 
               prefix={<UserOutlined />} 
-              placeholder="Digite seu email" 
+              placeholder={`Email (ex: ${DEMO_EMAIL})`}
             />
           </Form.Item>
 
@@ -341,7 +426,7 @@ export function LoginPage() {
           >
             <Input.Password 
               prefix={<LockOutlined />} 
-              placeholder="Digite sua senha" 
+              placeholder={`Senha (ex: ${DEMO_PASSWORD})`}
             />
           </Form.Item>
 
@@ -366,17 +451,38 @@ export function LoginPage() {
             <Button 
               onClick={handleDemoLogin}
               disabled={loading}
+              type="default"
+              icon={<LoginOutlined />}
               style={{ 
                 width: '100%',
-                height: 40
+                height: 40,
+                borderColor: '#1890ff',
+                color: '#1890ff'
               }}
             >
-              Entrar como Demo
+              Entrar como Demo (Login Rápido)
             </Button>
           </Form.Item>
         </Form>
 
         <div style={{ textAlign: 'center', marginTop: 16 }}>
+          <Button 
+            size="small" 
+            danger
+            type="link"
+            onClick={() => {
+              console.log('🧹 Limpando localStorage e tokens antigos...')
+              localStorage.removeItem('token')
+              localStorage.removeItem('user')
+              localStorage.clear()
+              message.success('Cache limpo! Faça login novamente.')
+              setTimeout(() => window.location.reload(), 1000)
+            }}
+            style={{ fontSize: '11px' }}
+          >
+            🗑️ Limpar Cache
+          </Button>
+          <br />
           <Text type="secondary" style={{ fontSize: 12 }}>
             Ambiente Seguro ✓
           </Text>
