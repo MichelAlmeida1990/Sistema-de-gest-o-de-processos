@@ -450,6 +450,8 @@ export function LoginPage() {
                     size="small"
                     icon={<CopyOutlined />}
                     onClick={() => copyCredentials(DEMO_EMAIL)}
+                    disabled={copying}
+                    loading={copying}
                     style={{ marginLeft: 4 }}
                   />
                 </div>
@@ -461,6 +463,8 @@ export function LoginPage() {
                     size="small"
                     icon={<CopyOutlined />}
                     onClick={() => copyCredentials(DEMO_PASSWORD)}
+                    disabled={copying}
+                    loading={copying}
                     style={{ marginLeft: 4 }}
                   />
                 </div>
