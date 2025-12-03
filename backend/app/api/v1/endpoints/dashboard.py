@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
 from app.models.process import Process, ProcessStatus
-from app.models.task import Task, TaskStatus
+from app.models.task import Task, TaskStatus, TaskPriority
 from app.models.user import User, UserRole
 from app.models.timeline import TimelineEvent
 
@@ -31,7 +31,10 @@ async def test_dashboard():
 
 
 @router.get("/stats")
-async def get_dashboard_stats(db: Session = Depends(get_db)):
+async def get_dashboard_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Obter estatísticas gerais do dashboard baseado em dados reais."""
     try:
         # Total de processos
@@ -102,7 +105,8 @@ async def get_dashboard_stats(db: Session = Depends(get_db)):
 @router.get("/recent-activity")
 async def get_recent_activity(
     limit: int = 10,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """Obter atividades recentes baseado em dados reais."""
     try:
@@ -151,7 +155,8 @@ async def get_recent_activity(
 @router.get("/processes")
 async def get_process_summary(
     limit: int = 5,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """Obter resumo de processos baseado em dados reais."""
     try:
@@ -184,7 +189,8 @@ async def get_process_summary(
 @router.get("/tasks")
 async def get_task_summary(
     limit: int = 5,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """Obter resumo de tarefas baseado em dados reais."""
     try:
@@ -215,7 +221,10 @@ async def get_task_summary(
 
 
 @router.get("/performance")
-async def get_performance_metrics(db: Session = Depends(get_db)):
+async def get_performance_metrics(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Obter métricas de performance baseado em dados reais."""
     try:
         # Taxa de conclusão de processos
@@ -296,13 +305,16 @@ async def get_performance_metrics(db: Session = Depends(get_db)):
 
 
 @router.get("/alerts")
-async def get_alerts(db: Session = Depends(get_db)):
+async def get_alerts(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Obter alertas baseado em dados reais."""
     try:
         # Tarefas urgentes (alta prioridade e próximas do vencimento)
         urgent_tasks = db.query(func.count(Task.id)).filter(
             and_(
-                Task.priority == 'urgent',
+                Task.priority == TaskPriority.URGENT,
                 Task.due_date <= datetime.now() + timedelta(days=1),
                 Task.status != TaskStatus.COMPLETED
             )

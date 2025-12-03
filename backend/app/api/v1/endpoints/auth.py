@@ -4,10 +4,10 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
+from datetime import datetime
 import logging
+import traceback
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -24,14 +24,23 @@ logger = logging.getLogger(__name__)
 # ===========================================
 
 router = APIRouter()
-limiter = Limiter(key_func=get_remote_address)
+
+# Rate limiter (opcional)
+try:
+    from slowapi import Limiter
+    from slowapi.util import get_remote_address
+    # Criar limiter sem tentar ler .env automaticamente
+    import os
+    os.environ.pop('ENV_FILE', None)  # Remover env_file se existir
+    limiter = Limiter(key_func=get_remote_address, default_limits=["1000/hour"])
+except (ImportError, Exception) as e:
+    limiter = None
 
 # ===========================================
 # ENDPOINTS
 # ===========================================
 
 @router.post("/login")
-@limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
 async def login(
     request: Request,
     login_data: UserLogin,
@@ -73,21 +82,74 @@ async def login(
         )
         
         # Converter usuário ORM para schema Pydantic
-        user_profile = UserProfile.from_orm(user)
+        try:
+            # Criar dict com todos os campos necessários
+            user_dict = {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+                "full_name": user.full_name,
+                "role": user.role.value if hasattr(user.role, 'value') else str(user.role),
+                "status": user.status.value if hasattr(user.status, 'value') else str(user.status) if user.status else "active",
+                "is_active": user.is_active if hasattr(user, 'is_active') else True,
+                "is_verified": user.is_verified if hasattr(user, 'is_verified') else False,
+                "is_2fa_enabled": user.is_2fa_enabled if hasattr(user, 'is_2fa_enabled') else False,
+                "phone": getattr(user, 'phone', None),
+                "avatar_url": getattr(user, 'avatar_url', None),
+                "bio": getattr(user, 'bio', None),
+                "timezone": getattr(user, 'timezone', 'America/Sao_Paulo'),
+                "language": getattr(user, 'language', 'pt-BR'),
+                "last_login": getattr(user, 'last_login', None),
+                "created_at": user.created_at if hasattr(user, 'created_at') and user.created_at else datetime.now(),
+                "updated_at": user.updated_at if hasattr(user, 'updated_at') and user.updated_at else datetime.now()
+            }
+            user_profile = UserProfile(**user_dict)
+        except Exception as profile_error:
+            logger.error(f"Erro ao converter usuário para profile: {profile_error}")
+            logger.error(traceback.format_exc())
+            # Fallback: criar profile básico com campos mínimos
+            user_profile = UserProfile(
+                id=user.id,
+                email=user.email,
+                username=user.username,
+                full_name=user.full_name,
+                role=user.role.value if hasattr(user.role, 'value') else str(user.role),
+                status=user.status.value if hasattr(user.status, 'value') else str(user.status) if user.status else "active",
+                is_active=getattr(user, 'is_active', True),
+                is_verified=getattr(user, 'is_verified', False),
+                is_2fa_enabled=getattr(user, 'is_2fa_enabled', False),
+                phone=None,
+                avatar_url=None,
+                bio=None,
+                timezone='America/Sao_Paulo',
+                language='pt-BR',
+                last_login=None,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+        
         return LoginResponse(user=user_profile, token=token, requires_2fa=False)
         
     except HTTPException:
         raise
     except Exception as e:
+        error_trace = traceback.format_exc()
         logger.error(f"Erro no login: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erro interno do servidor"
-        )
+        logger.error(f"Traceback completo: {error_trace}")
+        # Em desenvolvimento, mostrar mais detalhes
+        if settings.DEBUG:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Erro interno do servidor: {str(e)}"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro interno do servidor"
+            )
 
 
 @router.post("/register")
-@limiter.limit("10/minute")
 async def register(
     request: Request,
     user_data: UserCreate,

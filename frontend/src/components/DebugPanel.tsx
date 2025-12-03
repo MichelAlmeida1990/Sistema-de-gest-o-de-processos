@@ -92,12 +92,12 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({ isVisible = false }) => 
           </Space>
         }
         style={{ margin: 0, height: '100%' }}
-        bodyStyle={{ 
+        styles={{ body: { 
           padding: '8px', 
           height: '400px', 
           overflow: 'auto',
           fontSize: '11px'
-        }}
+        } }}
       >
         <div style={{ fontFamily: 'monospace' }}>
           {logs.length === 0 ? (

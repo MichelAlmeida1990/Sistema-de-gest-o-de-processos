@@ -6,7 +6,7 @@ export const config = {
   // API
   API_BASE_URL: import.meta.env.VITE_API_URL || 
                 import.meta.env.VITE_API_BASE_URL || 
-                'http://192.168.0.16:8000/api/v1',
+                'http://localhost:8000/api/v1',
   
   // App
   APP_NAME: import.meta.env.VITE_APP_NAME || 'Sistema de Gestão de Processos',
@@ -21,7 +21,7 @@ export const config = {
   
   // WebSocket (ajustável para produção)
   WS_URL: import.meta.env.VITE_WS_URL || 
-          (import.meta.env.VITE_API_URL || 'http://192.168.0.16:8000').replace('http', 'ws'),
+          (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace('http', 'ws'),
   
   // Features (podem ser desabilitadas via env vars)
   FEATURES: {
@@ -32,6 +32,11 @@ export const config = {
     ENABLE_TIMELINE: import.meta.env.VITE_ENABLE_TIMELINE !== 'false',
     ENABLE_WEBSOCKET: import.meta.env.VITE_ENABLE_WEBSOCKET !== 'false'
   }
+}
+
+// Função helper para obter URL da API
+export function getApiUrl(): string {
+  return config.API_BASE_URL
 }
 
 export default config

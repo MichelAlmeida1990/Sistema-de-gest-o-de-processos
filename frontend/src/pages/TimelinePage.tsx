@@ -346,7 +346,12 @@ export const TimelinePage: React.FC = () => {
               </Button>
               <Button
                 icon={<FilterOutlined />}
-                style={{ borderRadius: '12px' }}
+                style={{ 
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #20b2aa 0%, #1a9b94 100%)',
+                  border: 'none',
+                  color: '#ffffff'
+                }}
               >
                 Filtros
               </Button>

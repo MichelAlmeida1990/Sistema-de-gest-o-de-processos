@@ -29,7 +29,7 @@ export const isSlowConnection = (): boolean => {
 
 export const getMobileConfig = () => {
   return {
-    timeout: isSlowConnection() ? 60000 : 30000, // 60s para conexão lenta
+    timeout: isSlowConnection() ? 90000 : 60000, // 90s para conexão lenta, 60s para normal (aumentado para requisições de IA)
     retries: 3,
     retryDelay: 2000
   }

@@ -22,6 +22,9 @@ import { SearchPage } from './pages/SearchPage'
 import { FunnelPage } from './pages/FunnelPage'
 import { RDStationPage } from './pages/RDStationPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { DeadlineCalculatorPage } from './pages/DeadlineCalculatorPage'
+import { LegalDiagnosisPage } from './pages/LegalDiagnosisPage'
+import { JurisprudencePage } from './pages/JurisprudencePage'
 
 // Componentes de Layout
 import { AppLayout } from './components/layout/AppLayout'
@@ -111,6 +114,9 @@ function AppContent() {
         <Route path="/funnel" element={<FunnelPage />} />
         <Route path="/rdstation" element={<RDStationPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/deadline-calculator" element={<DeadlineCalculatorPage />} />
+        <Route path="/legal-diagnosis" element={<LegalDiagnosisPage />} />
+        <Route path="/jurisprudence" element={<JurisprudencePage />} />
         
         {/* Rota de fallback */}
         <Route path="*" element={<NotFoundPage />} />

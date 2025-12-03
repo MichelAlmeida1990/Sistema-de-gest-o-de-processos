@@ -285,10 +285,10 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children }) => {
             ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
             : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
         }}
-        bodyStyle={{
+        styles={{ body: {
           padding: '16px',
           background: 'transparent'
-        }}
+        } }}
       >
         <div style={{
           display: 'flex',

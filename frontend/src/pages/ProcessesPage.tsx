@@ -30,39 +30,97 @@ export const ProcessesPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   
-  const { user } = useAuth()
+  const { user, isLoading: authLoading } = useAuth()
 
   // Carregar processos
   const loadProcesses = async () => {
+    // Não carregar se ainda estiver validando autenticação
+    if (authLoading) {
+      console.log('⏳ Aguardando validação de autenticação...')
+      return
+    }
+    
+    // Não carregar se não houver usuário autenticado
+    if (!user) {
+      console.log('❌ Usuário não autenticado. Aguardando login...')
+      return
+    }
+    
     setLoading(true)
     try {
       console.log('Carregando processos...')
       
+      // Verificar token antes de fazer a requisição
+      const token = localStorage.getItem('token')
+      console.log('🔍 Token antes da requisição:', token ? token.substring(0, 20) + '...' : 'NÃO ENCONTRADO')
+      
+      if (!token || token === 'undefined' || token === 'null') {
+        console.log('❌ Token não encontrado ou inválido')
+        message.warning('Token não encontrado. Verificando autenticação...')
+        // Não redirecionar imediatamente - deixar o useAuth tratar
+        return
+      }
+      
       // Usar dados reais da API
-      const response = await processService.getProcesses({
-        page: currentPage,
-        limit: pageSize
-      })
+      const response = await processService.getProcesses(
+        undefined, // filters
+        currentPage,
+        pageSize
+      )
       
-      setProcesses(response.processes)
-      setTotal(response.total)
+      // A resposta pode vir diretamente ou dentro de um objeto 'data'
+      const processesList = response.processes || response.data?.processes || []
+      const totalCount = response.total || response.data?.total || 0
       
-      console.log('Processos carregados com sucesso (dados reais)')
+      setProcesses(processesList)
+      setTotal(totalCount)
       
-    } catch (error) {
-      console.error('Erro ao carregar processos:', error)
-      // Se for erro 401, não mostrar mensagem de erro - será redirecionado
-      if (error.response?.status !== 401) {
-        message.error('Erro ao carregar processos')
+      console.log('✅ Processos carregados com sucesso (dados reais)')
+      
+    } catch (error: any) {
+      console.error('❌ Erro ao carregar processos:', error)
+      
+      if (error.response?.status === 401) {
+        console.log('🚫 Erro 401 detectado na página de processos')
+        console.log('🔍 Detalhes do erro:', error.response?.data)
+        
+        // Verificar se o token ainda existe e é válido
+        const token = localStorage.getItem('token')
+        if (!token || token === 'undefined' || token === 'null') {
+          console.log('⚠️ Token não encontrado após erro 401')
+          message.warning('Sessão expirada. Redirecionando para login...')
+          setTimeout(() => {
+            window.location.href = '/login'
+          }, 1500)
+        } else {
+          // Token existe mas foi rejeitado - pode ser expirado
+          console.log('⚠️ Token rejeitado pelo servidor - pode estar expirado')
+          message.warning('Token inválido. Verificando autenticação...')
+          // Não redirecionar imediatamente - deixar o useAuth tentar validar
+        }
+      } else {
+        message.error('Erro ao carregar processos. Tente novamente.')
       }
     } finally {
       setLoading(false)
     }
   }
 
+  // Carregar processos quando o usuário estiver autenticado
   useEffect(() => {
-    loadProcesses()
-  }, [currentPage, pageSize, searchText])
+    // Aguardar validação de autenticação terminar
+    if (authLoading) {
+      console.log('⏳ Aguardando validação de autenticação...')
+      return
+    }
+    
+    // Carregar processos apenas se o usuário estiver autenticado
+    if (user) {
+      loadProcesses()
+    } else {
+      console.log('❌ Usuário não autenticado. Não carregando processos.')
+    }
+  }, [user, authLoading, currentPage, pageSize, searchText])
 
   // Funções para gerenciar processos
   const handleCreateProcess = () => {
@@ -281,6 +339,44 @@ export const ProcessesPage: React.FC = () => {
           </Col>
           <Col>
             <Space>
+              <Button 
+                size="small"
+                onClick={async () => {
+                  const token = localStorage.getItem('token')
+                  console.log('🔍 Token atual:', token)
+                  if (!token || token === 'undefined') {
+                    message.error('Token não encontrado! Faça login novamente.')
+                    window.location.href = '/login'
+                  } else {
+                    console.log('🔑 Token:', token.substring(0, 30) + '...')
+                    
+                    // Testar se o token funciona fazendo uma requisição
+                    try {
+                      const response = await fetch('http://localhost:8000/api/v1/processes/', {
+                        headers: {
+                          'Authorization': `Bearer ${token}`,
+                          'Content-Type': 'application/json'
+                        }
+                      })
+                      
+                      console.log('🧪 Teste de token - Status:', response.status)
+                      
+                      if (response.ok) {
+                        message.success('Token válido e funcionando!')
+                      } else {
+                        message.error(`Token rejeitado pelo servidor: ${response.status}`)
+                        console.log('❌ Resposta do servidor:', await response.text())
+                      }
+                    } catch (error) {
+                      message.error('Erro ao testar token')
+                      console.error('❌ Erro no teste:', error)
+                    }
+                  }
+                }}
+                style={{ fontSize: '11px' }}
+              >
+                🧪 Testar Token
+              </Button>
               <Button 
                 icon={<ReloadOutlined />} 
                 onClick={loadProcesses}

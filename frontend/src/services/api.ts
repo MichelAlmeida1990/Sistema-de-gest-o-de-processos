@@ -3,6 +3,7 @@
 // ===========================================
 
 import config from '../config/env'
+import { message } from 'antd'
 
 const API_BASE_URL = config.API_BASE_URL
 
@@ -90,7 +91,14 @@ class ApiService {
         if (error.response?.status === 401) {
           console.log('🚫 Erro 401 - Token inválido ou expirado')
           console.log('🔍 URL que causou o erro:', error.config?.url)
-          console.log('🔍 Headers enviados:', error.config?.headers)
+          
+          // Ignorar erros 401 em endpoints de autenticação (login, register, etc)
+          if (error.config?.url?.includes('/auth/login') || 
+              error.config?.url?.includes('/auth/register') ||
+              error.config?.url?.includes('/auth/refresh')) {
+            console.log('ℹ️ Erro 401 em endpoint de autenticação - ignorando')
+            return Promise.reject(error)
+          }
           
           // Verificar se é realmente um erro de autenticação ou se é um problema de configuração
           const currentToken = this.getToken()
@@ -102,23 +110,22 @@ class ApiService {
             console.log('   - Token malformado')
             console.log('   - Problema no backend')
             console.log('   - Headers incorretos')
+            
+            // Não limpar o token imediatamente - deixar a validação acontecer
+            // Apenas limpar se for uma requisição crítica (não é /auth/me)
+            if (!error.config?.url?.includes('/auth/me')) {
+              // Limpar token apenas se não for uma tentativa de validação
+              this.clearToken()
+              console.log('📌 Token limpo. A página deve tratar o erro.')
+            } else {
+              console.log('ℹ️ Erro 401 em /auth/me - token pode estar expirado, mas não limpando ainda')
+            }
           } else {
             console.log('⚠️ Nenhum token encontrado durante erro 401')
-            console.log('🔍 Possíveis causas:')
-            console.log('   - Token não foi salvo após login')
-            console.log('   - Token foi limpo incorretamente')
-            console.log('   - Problema no localStorage')
+            console.log('📌 Token já estava ausente.')
           }
           
-          // Mostrar alerta em vez de redirecionar automaticamente
-          console.log('🛑 ERRO 401 DETECTADO - Verifique os logs acima')
-          console.log('🔄 Para redirecionar manualmente, execute: window.location.href = "/login"')
-          
-          // Token expirado ou inválido
-          this.clearToken()
-          
-          // Não redirecionar automaticamente - deixar o usuário ver os logs
-          // window.location.href = '/login'
+          console.log('🛑 ERRO 401 DETECTADO - A página deve tratar o erro')
         }
         return Promise.reject(error)
       }
@@ -129,12 +136,24 @@ class ApiService {
   }
 
   private loadToken(): void {
-    this.token = localStorage.getItem('token')
+    const token = localStorage.getItem('token')
+    if (token && token !== 'undefined' && token !== 'null' && token.trim() !== '') {
+      this.token = token
+      console.log('🔄 Token carregado do localStorage:', token.substring(0, 20) + '...')
+    } else {
+      this.token = null
+      console.log('🔄 Nenhum token válido encontrado no localStorage')
+    }
   }
 
   public setToken(token: string): void {
-    this.token = token
-    localStorage.setItem('token', token)
+    if (token && token !== 'undefined' && token !== 'null' && token.trim() !== '') {
+      this.token = token
+      localStorage.setItem('token', token)
+      console.log('✅ Token salvo:', token.substring(0, 20) + '...')
+    } else {
+      console.log('⚠️ Tentativa de salvar token inválido:', token)
+    }
   }
 
   public clearToken(): void {
@@ -151,7 +170,7 @@ class ApiService {
     console.log('🔍 Token no localStorage:', storedToken ? 'EXISTE' : 'NÃO EXISTE')
     console.log('🔍 Valor do token:', storedToken)
     
-    if (storedToken && storedToken !== 'undefined' && storedToken !== 'null') {
+    if (storedToken && storedToken !== 'undefined' && storedToken !== 'null' && storedToken.trim() !== '') {
       this.token = storedToken
       console.log('✅ Token válido encontrado:', storedToken.substring(0, 20) + '...')
       return storedToken

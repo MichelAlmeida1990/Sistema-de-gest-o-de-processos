@@ -199,3 +199,6 @@ async def calcular_atualizacao_acumulada(
             detail=f"Erro ao calcular atualização acumulada: {str(e)}"
         )
 
+
+
+

@@ -9,7 +9,6 @@ import 'dayjs/locale/pt-br'
 
 import App from './App'
 import './index.css'
-import './utils/buttonEffects'
 
 // Configurar locale do dayjs
 dayjs.locale('pt-br')

@@ -1,8 +1,8 @@
 # ===========================================
-# DEPENDÊNCIAS DO BACKEND (FASTAPI)
+# DEPENDENCIAS DO BACKEND (FASTAPI)
 # ===========================================
 
-# Framework Web - Versões compatíveis com Python 3.13
+# Framework Web - Versoes compativeis com Python 3.13
 fastapi==0.115.6
 uvicorn[standard]==0.32.1
 
@@ -15,7 +15,7 @@ psycopg2-binary==2.9.10
 redis==5.2.0
 hiredis==2.3.2
 
-# Autenticação e Segurança
+# Autenticacao e Seguranca
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.12
@@ -25,7 +25,7 @@ cryptography>=43.0.0
 pyotp==2.9.0
 qrcode[pil]==7.4.2
 
-# Validação e Serialização - Versões compatíveis com Python 3.13
+# Validacao e Serializacao - Versoes compativeis com Python 3.13
 pydantic==2.10.3
 pydantic-settings==2.7.0
 email-validator==2.2.0
@@ -41,7 +41,7 @@ aiofiles==24.1.0
 structlog==24.4.0
 sentry-sdk[fastapi]==2.19.2
 
-# Utilitários
+# Utilitarios
 python-dateutil==2.9.0
 pytz==2024.2
 click==8.1.7
@@ -75,3 +75,29 @@ reportlab==4.2.5
 # weasyprint==62.3  # Comentado - causa problemas em alguns sistemas
 jinja2==3.1.4
 
+# ===========================================
+# IA E ANALISE DE TEXTO (HUGGING FACE - GRATUITO)
+# ===========================================
+
+# Hugging Face - Biblioteca oficial para Inference API
+huggingface_hub>=0.20.0
+
+# Hugging Face Transformers (IA e LLMs)
+transformers>=4.35.0
+torch>=2.1.0
+sentence-transformers>=2.2.0
+accelerate>=0.24.0
+
+# NLP e Analise de Texto
+spacy>=3.7.0
+nltk>=3.8.0
+langdetect>=1.0.9
+
+# Processamento de Documentos
+python-docx>=1.0.0
+PyPDF2>=3.0.0
+pdfplumber>=0.10.0
+
+# Validacao e Gramatica
+language-tool-python>=2.7.1
+pyspellchecker>=0.7.0

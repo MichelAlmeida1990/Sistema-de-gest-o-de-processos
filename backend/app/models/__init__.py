@@ -10,6 +10,8 @@ from .timeline import TimelineEvent
 from .notification import Notification
 from .audit import AuditLog
 from .precatorio import Precatorio
+from .legal_diagnosis import LegalDiagnosis
+from .jurisprudence import Jurisprudence, JurisprudenceChat
 
 __all__ = [
     "User",
@@ -20,5 +22,8 @@ __all__ = [
     "Notification",
     "AuditLog",
     "Precatorio",
+    "LegalDiagnosis",
+    "Jurisprudence",
+    "JurisprudenceChat",
 ]
 

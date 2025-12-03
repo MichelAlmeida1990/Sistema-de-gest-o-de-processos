@@ -51,7 +51,7 @@ class WebSocketService {
       this.userId = userId
 
       try {
-        const wsUrl = `ws://192.168.0.16:8000/api/v1/ws/${userId}`
+        const wsUrl = `ws://localhost:8000/api/v1/ws/${userId}`
         console.log('Conectando WebSocket:', wsUrl)
         this.ws = new WebSocket(wsUrl)
 

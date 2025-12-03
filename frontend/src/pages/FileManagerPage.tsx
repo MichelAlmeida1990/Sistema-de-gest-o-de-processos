@@ -275,7 +275,7 @@ export const FileManagerPage: React.FC = () => {
         border: '1px solid #e8e8e8',
         transition: 'all 0.2s'
       }}
-      bodyStyle={{ padding: '16px' }}
+      styles={{ body: { padding: '16px' } }}
       actions={[
         <Tooltip title="Visualizar">
           <EyeOutlined onClick={() => window.open(file.url, '_blank')} />
@@ -569,7 +569,7 @@ export const FileManagerPage: React.FC = () => {
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
           border: 'none'
         }}
-        bodyStyle={{ padding: '24px' }}
+        styles={{ body: { padding: '24px' } }}
       >
         {filteredFiles.length === 0 ? (
           <Empty 

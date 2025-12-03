@@ -8,15 +8,14 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 try:
     from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
     SLOWAPI_AVAILABLE = True
 except ImportError:
     SLOWAPI_AVAILABLE = False
     Limiter = None
-try:
-    from slowapi.util import get_remote_address
-    from slowapi.errors import RateLimitExceeded
-except ImportError:
-    pass
+    RateLimitExceeded = None
+    _rate_limit_exceeded_handler = None
 import time
 import logging
 
@@ -39,7 +38,13 @@ logger = logging.getLogger(__name__)
 # CONFIGURAÇÃO DO RATE LIMITER
 # ===========================================
 
-limiter = Limiter(key_func=get_remote_address)
+if SLOWAPI_AVAILABLE:
+    try:
+        limiter = Limiter(key_func=get_remote_address)
+    except Exception:
+        limiter = None
+else:
+    limiter = None
 
 # ===========================================
 # CRIAÇÃO DA APLICAÇÃO FASTAPI
@@ -54,9 +59,10 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Adicionar rate limiter
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# Adicionar rate limiter (se disponível)
+if SLOWAPI_AVAILABLE and limiter and RateLimitExceeded and _rate_limit_exceeded_handler:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ===========================================
 # MIDDLEWARES
@@ -247,39 +253,40 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Verificação de saúde da aplicação."""
+    import time
+    # Health check simples - sempre retorna OK se o servidor está rodando
+    db_status = "unknown"
+    redis_status = "unknown"
+    
+    # Verificar banco de dados (opcional)
     try:
-        # Verificar banco de dados
         from app.core.database import SessionLocal
         from sqlalchemy import text
         db = SessionLocal()
         db.execute(text("SELECT 1"))
         db.close()
-        
-        # Redis é opcional - não falhar se não estiver disponível
+        db_status = "connected"
+    except Exception as db_error:
+        logger.warning(f"Database not available: {db_error}")
+        db_status = "disconnected"
+    
+    # Redis é opcional
+    try:
+        from app.core.redis import get_redis
+        redis_client = await get_redis()
+        await redis_client.ping()
+        redis_status = "connected"
+    except Exception as redis_error:
+        logger.warning(f"Redis not available: {redis_error}")
         redis_status = "disconnected"
-        try:
-            from app.core.redis import redis_client
-            await redis_client.ping()
-            redis_status = "connected"
-        except Exception as redis_error:
-            logger.warning(f"Redis not available: {redis_error}")
-        
-        return {
-            "status": "healthy",
-            "database": "connected",
-            "redis": redis_status,
-            "timestamp": time.time()
-        }
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        return JSONResponse(
-            status_code=503,
-            content={
-                "status": "unhealthy",
-                "error": str(e),
-                "timestamp": time.time()
-            }
-        )
+    
+    return {
+        "status": "healthy",
+        "database": db_status,
+        "redis": redis_status,
+        "timestamp": time.time(),
+        "version": settings.VERSION
+    }
 
 # ===========================================
 # TRATAMENTO DE EXCEÇÕES
@@ -309,17 +316,35 @@ async def not_found_handler(request: Request, exc):
         }
     )
 
-@app.exception_handler(500)
-async def internal_error_handler(request: Request, exc):
-    """Tratador para erros internos do servidor."""
-    logger.error(f"Internal server error: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={
-            "error": "INTERNAL_ERROR",
-            "message": "Erro interno do servidor"
-        }
-    )
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Tratador genérico para todas as exceções."""
+    import traceback
+    error_details = str(exc)
+    traceback_str = traceback.format_exc()
+    
+    logger.error(f"Unhandled exception: {exc}")
+    logger.error(f"Traceback: {traceback_str}")
+    
+    # Em desenvolvimento, mostrar mais detalhes
+    if settings.DEBUG:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "INTERNAL_ERROR",
+                "message": "Erro interno do servidor",
+                "details": error_details,
+                "traceback": traceback_str.split('\n')[-5:] if settings.DEBUG else None
+            }
+        )
+    else:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "INTERNAL_ERROR",
+                "message": "Erro interno do servidor"
+            }
+        )
 
 # ===========================================
 # CONFIGURAÇÃO PARA DESENVOLVIMENTO

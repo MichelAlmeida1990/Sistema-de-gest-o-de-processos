@@ -1,27 +1,64 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
   Row, Col, Card, Statistic, Typography, Button, 
-  Avatar, List, Tag, Space, Badge, Progress
+  Avatar, List, Tag, Space, Badge, Spin
 } from 'antd'
 import {
-  UserOutlined, FileTextOutlined, ClockCircleOutlined,
-  CheckCircleOutlined, RiseOutlined, BellOutlined, 
+  FileTextOutlined, ClockCircleOutlined,
+  CheckCircleOutlined, BellOutlined, 
   TrophyOutlined, RocketOutlined, BarChartOutlined,
   ArrowUpOutlined, DollarOutlined
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useMobile } from '../hooks/useMobile'
-import { MobileDashboardPage } from './mobile/MobileDashboardPage'
 import { NativeMobileDashboardPage } from './mobile/NativeMobileDashboardPage'
+import { dashboardService } from '../services/dashboardService'
 
 const { Title, Text } = Typography
 
 export const DashboardPage: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [dashboardStats, setDashboardStats] = useState<any>(null)
+  const [recentActivity, setRecentActivity] = useState<any[]>([])
   const navigate = useNavigate()
   const { user } = useAuth()
   const { mobile } = useMobile()
+
+  // Carregar dados reais do dashboard
+  useEffect(() => {
+    loadDashboardData()
+  }, [])
+
+  const loadDashboardData = async () => {
+    setLoading(true)
+    try {
+      // Carregar apenas os dados que são realmente usados
+      const [stats, activity] = await Promise.all([
+        dashboardService.getDashboardStats(),
+        dashboardService.getRecentActivity(10)
+      ])
+
+      setDashboardStats(stats)
+      setRecentActivity(activity || [])
+    } catch (error: any) {
+      console.error('Erro ao carregar dados do dashboard:', error)
+      // Fallback para dados padrão em caso de erro
+      setDashboardStats({
+        totalProcesses: 0,
+        activeProcesses: 0,
+        completedTasks: 0,
+        averageTime: 0,
+        totalRevenue: 0,
+        pendingTasks: 0,
+        overdueTasks: 0,
+        teamMembers: 0
+      })
+      setRecentActivity([])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Usar versão mobile nativa (sem Ant Design)
   if (mobile) {
@@ -55,91 +92,107 @@ export const DashboardPage: React.FC = () => {
     }
   }
 
-  // Dados estáticos para o dashboard
-  const stats = [
+  // Dados dinâmicos do dashboard
+  const stats = dashboardStats ? [
     {
       title: 'Processos Ativos',
-      value: 28,
+      value: dashboardStats.activeProcesses,
       prefix: <FileTextOutlined />,
-      suffix: '',
+      suffix: `de ${dashboardStats.totalProcesses} total`,
       trend: '+12%',
       trendDirection: 'up',
       color: '#00afee'
     },
     {
       title: 'Tarefas Concluídas',
-      value: 156,
+      value: dashboardStats.completedTasks,
       prefix: <CheckCircleOutlined />,
-      suffix: '',
+      suffix: 'concluídas',
       trend: '+8%',
       trendDirection: 'up',
       color: '#52c41a'
     },
     {
       title: 'Tempo Médio',
-      value: '2.5h',
+      value: `${dashboardStats.averageTime} dias`,
       prefix: <ClockCircleOutlined />,
-      suffix: '',
+      suffix: 'por processo',
       trend: '-15%',
       trendDirection: 'down',
       color: '#faad14'
     },
     {
       title: 'Receita Total',
-      value: 'R$ 125k',
+      value: `R$ ${dashboardStats.totalRevenue.toLocaleString('pt-BR')}`,
       prefix: <DollarOutlined />,
-      suffix: '',
+      suffix: 'total',
       trend: '+22%',
       trendDirection: 'up',
       color: '#722ed1'
     }
-  ]
+  ] : []
 
-  const recentActivities = [
-    {
-      id: 1,
-      user: 'João Silva',
-      action: 'Concluiu o processo',
-      target: 'Processo #2024-001',
-      time: '2 min atrás',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      type: 'success'
-    },
-    {
-      id: 2,
-      user: 'Maria Santos',
-      action: 'Criou nova tarefa',
-      target: 'Revisão de Contrato',
-      time: '15 min atrás',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
-      type: 'info'
-    },
-    {
-      id: 3,
-      user: 'Pedro Costa',
-      action: 'Adicionou arquivo',
-      target: 'Documento Legal.pdf',
-      time: '1 hora atrás',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-      type: 'warning'
-    },
-    {
-      id: 4,
-      user: 'Ana Oliveira',
-      action: 'Atualizou status',
-      target: 'Processo #2024-003',
-      time: '2 horas atrás',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-      type: 'success'
+  // Formatar atividades recentes do backend
+  const formatRecentActivities = () => {
+    if (!recentActivity || recentActivity.length === 0) {
+      return []
     }
-  ]
+    
+    return recentActivity.map((activity, index) => {
+      // Calcular tempo relativo
+      const timestamp = new Date(activity.timestamp)
+      const now = new Date()
+      const diffMs = now.getTime() - timestamp.getTime()
+      const diffMins = Math.floor(diffMs / 60000)
+      const diffHours = Math.floor(diffMs / 3600000)
+      
+      let timeAgo = ''
+      if (diffMins < 1) {
+        timeAgo = 'Agora'
+      } else if (diffMins < 60) {
+        timeAgo = `${diffMins} min atrás`
+      } else if (diffHours < 24) {
+        timeAgo = `${diffHours} hora${diffHours > 1 ? 's' : ''} atrás`
+      } else {
+        const diffDays = Math.floor(diffHours / 24)
+        timeAgo = `${diffDays} dia${diffDays > 1 ? 's' : ''} atrás`
+      }
+      
+      return {
+        id: activity.id || index,
+        user: activity.user || 'Sistema',
+        action: activity.title || activity.description || 'Ação realizada',
+        target: activity.description || '',
+        time: timeAgo,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(activity.user || 'User')}&background=00afee&color=fff`,
+        type: activity.status || 'info'
+      }
+    })
+  }
+  
+  const recentActivities = formatRecentActivities()
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        flexDirection: 'column'
+      }}>
+        <Spin size="large" />
+        <Text style={{ marginTop: 16, fontSize: '16px' }}>
+          Carregando dados do dashboard...
+        </Text>
+      </div>
+    )
+  }
 
   return (
     <div style={{ 
       minHeight: '100vh',
-      background: darkMode 
-        ? 'linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%)'
-        : 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
       padding: '24px',
       maxWidth: '100%',
       overflow: 'hidden'
@@ -251,16 +304,10 @@ export const DashboardPage: React.FC = () => {
             <Card
               style={{
                 borderRadius: '16px',
-                background: darkMode 
-                  ? 'rgba(255, 255, 255, 0.05)'
-                  : 'rgba(255, 255, 255, 0.8)',
+                background: 'rgba(255, 255, 255, 0.8)',
                 backdropFilter: 'blur(10px)',
-                border: darkMode 
-                  ? '1px solid rgba(255, 255, 255, 0.1)'
-                  : '1px solid rgba(255, 255, 255, 0.3)',
-                boxShadow: darkMode
-                  ? '0 8px 32px rgba(0, 0, 0, 0.3)'
-                  : '0 8px 32px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease'
               }}
@@ -270,7 +317,7 @@ export const DashboardPage: React.FC = () => {
               <Statistic
                 title={
                   <Text style={{ 
-                    color: darkMode ? '#ffffff' : '#666666',
+                    color: '#666666',
                     fontSize: '14px',
                     fontWeight: '500'
                   }}>
@@ -289,7 +336,7 @@ export const DashboardPage: React.FC = () => {
                 }
                 suffix={stat.suffix}
                 valueStyle={{ 
-                  color: darkMode ? '#ffffff' : '#000000',
+                  color: '#000000',
                   fontSize: '28px',
                   fontWeight: '700'
                 }}
@@ -329,22 +376,16 @@ export const DashboardPage: React.FC = () => {
           <Card
             style={{
               borderRadius: '16px',
-              background: darkMode 
-                ? 'rgba(255, 255, 255, 0.05)'
-                : 'rgba(255, 255, 255, 0.8)',
+              background: 'rgba(255, 255, 255, 0.8)',
               backdropFilter: 'blur(10px)',
-              border: darkMode 
-                ? '1px solid rgba(255, 255, 255, 0.1)'
-                : '1px solid rgba(255, 255, 255, 0.3)',
-              boxShadow: darkMode
-                ? '0 8px 32px rgba(0, 0, 0, 0.3)'
-                : '0 8px 32px rgba(0, 0, 0, 0.1)'
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
             }}
             title={
               <Space>
                 <BellOutlined style={{ color: '#00afee' }} />
                 <Title level={4} style={{ 
-                  color: darkMode ? '#ffffff' : '#000000',
+                  color: '#000000',
                   margin: 0
                 }}>
                   Atividades Recentes
@@ -352,45 +393,53 @@ export const DashboardPage: React.FC = () => {
               </Space>
             }
           >
-            <List
-              dataSource={recentActivities}
-              renderItem={(item) => (
-                <List.Item style={{ 
-                  padding: '16px 0',
-                  borderBottom: `1px solid ${darkMode ? '#333' : '#f0f0f0'}`
-                }}>
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar 
-                        src={item.avatar}
-                        size={48}
-                        style={{ 
-                          border: `2px solid ${item.type === 'success' ? '#52c41a' : item.type === 'warning' ? '#faad14' : '#1890ff'}`
-                        }}
-                      />
-                    }
-                    title={
-                      <Space>
-                        <Text strong style={{ color: darkMode ? '#ffffff' : '#000000' }}>
-                          {item.user}
+            {recentActivities.length > 0 ? (
+              <List
+                dataSource={recentActivities}
+                renderItem={(item) => (
+                  <List.Item style={{ 
+                    padding: '16px 0',
+                    borderBottom: '1px solid #f0f0f0'
+                  }}>
+                    <List.Item.Meta
+                      avatar={
+                        <Avatar 
+                          src={item.avatar}
+                          size={48}
+                          style={{ 
+                            border: `2px solid ${item.type === 'success' ? '#52c41a' : item.type === 'warning' ? '#faad14' : '#1890ff'}`
+                          }}
+                        />
+                      }
+                      title={
+                        <Space>
+                          <Text strong style={{ color: '#000000' }}>
+                            {item.user}
+                          </Text>
+                          <Text style={{ color: '#666666' }}>
+                            {item.action}
+                          </Text>
+                          {item.target && (
+                            <Text style={{ color: '#00afee' }}>
+                              {item.target}
+                            </Text>
+                          )}
+                        </Space>
+                      }
+                      description={
+                        <Text style={{ color: '#999999' }}>
+                          {item.time}
                         </Text>
-                        <Text style={{ color: darkMode ? '#cccccc' : '#666666' }}>
-                          {item.action}
-                        </Text>
-                        <Text style={{ color: '#00afee' }}>
-                          {item.target}
-                        </Text>
-                      </Space>
-                    }
-                    description={
-                      <Text style={{ color: darkMode ? '#999999' : '#999999' }}>
-                        {item.time}
-                      </Text>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
+                Nenhuma atividade recente
+              </div>
+            )}
           </Card>
         </Col>
 
@@ -398,72 +447,106 @@ export const DashboardPage: React.FC = () => {
           <Card
             style={{
               borderRadius: '16px',
-              background: darkMode 
-                ? 'rgba(255, 255, 255, 0.05)'
-                : 'rgba(255, 255, 255, 0.8)',
+              background: 'rgba(255, 255, 255, 0.8)',
               backdropFilter: 'blur(10px)',
-              border: darkMode 
-                ? '1px solid rgba(255, 255, 255, 0.1)'
-                : '1px solid rgba(255, 255, 255, 0.3)',
-              boxShadow: darkMode
-                ? '0 8px 32px rgba(0, 0, 0, 0.3)'
-                : '0 8px 32px rgba(0, 0, 0, 0.1)'
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
             }}
             title={
               <Space>
                 <TrophyOutlined style={{ color: '#00afee' }} />
                 <Title level={4} style={{ 
-                  color: darkMode ? '#ffffff' : '#000000',
+                  color: '#000000',
                   margin: 0
                 }}>
-                  Top Performers
+                  Resumo Rápido
                 </Title>
               </Space>
             }
           >
             <Space direction="vertical" style={{ width: '100%' }} size="large">
-              {[
-                { name: 'João Silva', score: 95, avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face', badge: '🥇' },
-                { name: 'Maria Santos', score: 88, avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face', badge: '🥈' },
-                { name: 'Pedro Costa', score: 82, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face', badge: '🥉' },
-                { name: 'Ana Oliveira', score: 76, avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face', badge: '⭐' }
-              ].map((performer, index) => (
-                <div key={index} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between',
-                  padding: '12px 16px',
-                  background: darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 175, 238, 0.05)',
-                  borderRadius: '12px',
-                  border: `1px solid ${darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 175, 238, 0.1)'}`
-                }}>
-                  <Space>
-                    <span style={{ fontSize: '24px' }}>{performer.badge}</span>
-                    <Avatar src={performer.avatar} size={40} />
-                    <div>
-                      <Text strong style={{ color: darkMode ? '#ffffff' : '#000000' }}>
-                        {performer.name}
-                      </Text>
-                      <br />
-                      <Progress 
-                        percent={performer.score} 
-                        size="small" 
-                        strokeColor="#00afee"
-                        showInfo={false}
-                        style={{ width: '100px' }}
+              {dashboardStats && (
+                <>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    padding: '12px 16px',
+                    background: 'rgba(0, 175, 238, 0.05)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(0, 175, 238, 0.1)'
+                  }}>
+                    <Text strong>Total de Processos</Text>
+                    <Badge 
+                      count={dashboardStats.totalProcesses || 0} 
+                      style={{ 
+                        backgroundColor: '#00afee',
+                        fontSize: '14px',
+                        fontWeight: 'bold'
+                      }}
+                    />
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    padding: '12px 16px',
+                    background: 'rgba(82, 196, 26, 0.05)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(82, 196, 26, 0.1)'
+                  }}>
+                    <Text strong>Tarefas Concluídas</Text>
+                    <Badge 
+                      count={dashboardStats.completedTasks || 0} 
+                      style={{ 
+                        backgroundColor: '#52c41a',
+                        fontSize: '14px',
+                        fontWeight: 'bold'
+                      }}
+                    />
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    padding: '12px 16px',
+                    background: 'rgba(250, 173, 20, 0.05)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(250, 173, 20, 0.1)'
+                  }}>
+                    <Text strong>Tarefas Pendentes</Text>
+                    <Badge 
+                      count={dashboardStats.pendingTasks || 0} 
+                      style={{ 
+                        backgroundColor: '#faad14',
+                        fontSize: '14px',
+                        fontWeight: 'bold'
+                      }}
+                    />
+                  </div>
+                  {dashboardStats.overdueTasks > 0 && (
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      padding: '12px 16px',
+                      background: 'rgba(255, 77, 79, 0.05)',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(255, 77, 79, 0.1)'
+                    }}>
+                      <Text strong>Tarefas Atrasadas</Text>
+                      <Badge 
+                        count={dashboardStats.overdueTasks || 0} 
+                        style={{ 
+                          backgroundColor: '#ff4d4f',
+                          fontSize: '14px',
+                          fontWeight: 'bold'
+                        }}
                       />
                     </div>
-                  </Space>
-                  <Badge 
-                    count={performer.score} 
-                    style={{ 
-                      backgroundColor: '#00afee',
-                      fontSize: '12px',
-                      fontWeight: 'bold'
-                    }}
-                  />
-                </div>
-              ))}
+                  )}
+                </>
+              )}
             </Space>
           </Card>
         </Col>

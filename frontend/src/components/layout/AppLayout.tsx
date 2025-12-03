@@ -19,7 +19,11 @@ import {
   BarChartOutlined,
   ApiOutlined,
   BulbOutlined,
-  BulbFilled
+  BulbFilled,
+  FileSearchOutlined,
+  TeamOutlined,
+  ToolOutlined,
+  WalletOutlined
 } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { NotificationCenter } from '../NotificationCenter'
@@ -54,97 +58,66 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
     }
   }, [isMobileDevice])
 
+  // Função auxiliar para criar item de menu
+  const createMenuItem = (key: string, icon: React.ReactNode, label: string, path: string) => ({
+    key,
+    icon,
+    label,
+    path
+  })
+
+  // Função auxiliar para criar submenu
+  const createSubMenu = (key: string, icon: React.ReactNode, label: string, children: any[]) => ({
+    key,
+    icon,
+    label,
+    children
+  })
+
   const menuItems = [
-    {
-      key: '/dashboard',
-      icon: <DashboardOutlined />,
-      label: 'Dashboard',
-      path: '/dashboard'
-    },
-    {
-      key: '/processes',
-      icon: <FileTextOutlined />,
-      label: 'Processos',
-      path: '/processes'
-    },
-    {
-      key: '/tasks',
-      icon: <CheckSquareOutlined />,
-      label: 'Tarefas',
-      path: '/tasks'
-    },
-    {
-      key: '/kanban',
-      icon: <AppstoreOutlined />,
-      label: 'Kanban',
-      path: '/kanban'
-    },
-    {
-      key: '/timeline',
-      icon: <ClockCircleOutlined />,
-      label: 'Timeline',
-      path: '/timeline'
-    },
-    {
-      key: '/files',
-      icon: <FolderOutlined />,
-      label: 'Arquivos',
-      path: '/files'
-    },
-    {
-      key: '/reports',
-      icon: <BarChartOutlined />,
-      label: 'Relatórios',
-      path: '/reports'
-    },
-  {
-      key: '/precatorios',
-      icon: <DollarOutlined />,
-      label: 'Precatórios',
-      path: '/precatorios'
-  },
-    {
-      key: '/deliveries',
-      icon: <SendOutlined />,
-      label: 'Entregas',
-      path: '/deliveries'
-    },
-    {
-      key: '/financial',
-      icon: <DollarOutlined />,
-      label: 'Financeiro',
-      path: '/financial'
-    },
-    {
-      key: '/notifications',
-      icon: <BellOutlined />,
-      label: 'Notificações',
-      path: '/notifications'
-    },
-    {
-      key: '/search',
-      icon: <SearchOutlined />,
-      label: 'Busca',
-      path: '/search'
-    },
-    {
-      key: '/funnel',
-      icon: <BarChartOutlined />,
-      label: 'Funil de Processos',
-      path: '/funnel'
-    },
-    {
-      key: '/rdstation',
-      icon: <ApiOutlined />,
-      label: 'RD Station',
-      path: '/rdstation'
-    },
-    {
-      key: '/admin',
-      icon: <SettingOutlined />,
-      label: 'Admin',
-      path: '/admin'
-    }
+    // PRINCIPAL - Itens mais usados (sempre visíveis)
+    createMenuItem('/dashboard', <DashboardOutlined />, 'Dashboard', '/dashboard'),
+    createMenuItem('/processes', <FileTextOutlined />, 'Processos', '/processes'),
+    createMenuItem('/tasks', <CheckSquareOutlined />, 'Tarefas', '/tasks'),
+    
+    // GESTÃO DE TRABALHO - Submenu
+    createSubMenu('work-management', <TeamOutlined />, 'Gestão de Trabalho', [
+      createMenuItem('/kanban', <AppstoreOutlined />, 'Kanban', '/kanban'),
+      createMenuItem('/timeline', <ClockCircleOutlined />, 'Timeline', '/timeline'),
+      createMenuItem('/files', <FolderOutlined />, 'Arquivos', '/files'),
+      createMenuItem('/deliveries', <SendOutlined />, 'Entregas', '/deliveries')
+    ]),
+    
+    // ANÁLISE E RELATÓRIOS - Submenu
+    createSubMenu('analysis', <BarChartOutlined />, 'Análise e Relatórios', [
+      createMenuItem('/reports', <BarChartOutlined />, 'Relatórios', '/reports'),
+      createMenuItem('/funnel', <BarChartOutlined />, 'Funil de Processos', '/funnel'),
+      createMenuItem('/search', <SearchOutlined />, 'Busca', '/search')
+    ]),
+    
+    // FERRAMENTAS JURÍDICAS - Submenu
+    createSubMenu('legal-tools', <ToolOutlined />, 'Ferramentas Jurídicas', [
+      createMenuItem('/deadline-calculator', <ClockCircleOutlined />, 'Calculadora de Prazos', '/deadline-calculator'),
+      createMenuItem('/legal-diagnosis', <FileSearchOutlined />, 'Diagnóstico Jurídico', '/legal-diagnosis'),
+      createMenuItem('/jurisprudence', <FileSearchOutlined />, 'Assistente de Jurisprudência', '/jurisprudence')
+    ]),
+    
+    // FINANCEIRO - Submenu
+    createSubMenu('financial', <WalletOutlined />, 'Financeiro', [
+      createMenuItem('/financial', <DollarOutlined />, 'Financeiro', '/financial'),
+      createMenuItem('/precatorios', <DollarOutlined />, 'Precatórios', '/precatorios')
+    ]),
+    
+    // INTEGRAÇÕES - Submenu
+    createSubMenu('integrations', <ApiOutlined />, 'Integrações', [
+      createMenuItem('/rdstation', <ApiOutlined />, 'RD Station', '/rdstation')
+    ]),
+    
+    // SISTEMA - Submenu
+    createSubMenu('system', <SettingOutlined />, 'Sistema', [
+      createMenuItem('/notifications', <BellOutlined />, 'Notificações', '/notifications'),
+      createMenuItem('/admin', <SettingOutlined />, 'Admin', '/admin')
+    ])
   ]
 
   const userMenuItems = [
@@ -168,9 +141,23 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
     },
   ]
 
+  // Função recursiva para encontrar item em submenus
+  const findMenuItem = (items: any[], key: string): any => {
+    for (const item of items) {
+      if (item.key === key) {
+        return item
+      }
+      if (item.children) {
+        const found = findMenuItem(item.children, key)
+        if (found) return found
+      }
+    }
+    return null
+  }
+
   const handleMenuClick = ({ key }: { key: string }) => {
-    const item = menuItems.find(item => item.key === key)
-    if (item) {
+    const item = findMenuItem(menuItems, key)
+    if (item && item.path) {
       navigate(item.path)
     }
   }
@@ -279,40 +266,85 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               background: 'transparent',
               border: 'none',
               padding: 0,
-              overflow: 'visible'
+              overflow: 'visible',
+              fontSize: '15px'
             }}
-            items={menuItems.map(item => ({
-              ...item,
-              label: collapsed ? '' : item.label, // Remove texto quando colapsado
-              style: {
-                margin: collapsed ? '2px 0' : '4px 0',
-                borderRadius: collapsed ? '10px' : '12px',
-                height: collapsed ? '44px' : '48px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center', // Sempre centralizado quando colapsado
-                fontWeight: '500',
-                transition: 'all 0.3s ease',
-                background: location.pathname === item.key 
-                  ? darkMode 
-                    ? 'rgba(25, 25, 112, 0.4)'
-                    : 'rgba(25, 25, 112, 0.3)'
-                  : 'transparent',
-                color: location.pathname === item.key
-                  ? '#191970'
-                  : darkMode ? '#ffffff' : '#666666',
-                padding: '0',
-                width: collapsed ? '44px' : 'auto',
-                minWidth: collapsed ? '44px' : 'auto',
-                maxWidth: collapsed ? '44px' : 'none',
-                boxShadow: location.pathname === item.key && collapsed
-                  ? darkMode 
-                    ? '0 4px 12px rgba(0, 175, 238, 0.3)'
-                    : '0 4px 12px rgba(0, 175, 238, 0.2)'
-                  : 'none',
-                overflow: 'hidden' // Garante que nada vaze
+            items={menuItems.map(item => {
+              // Se tem children, é um submenu
+              if (item.children) {
+                return {
+                  ...item,
+                  label: collapsed ? '' : item.label,
+                  children: item.children.map((child: any) => ({
+                    ...child,
+                    label: collapsed ? '' : child.label,
+                    style: {
+                      margin: collapsed ? '2px 0' : '4px 0',
+                      borderRadius: collapsed ? '10px' : '12px',
+                      height: collapsed ? '44px' : '48px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    fontWeight: '500',
+                    fontSize: '15px',
+                    transition: 'all 0.3s ease',
+                    background: location.pathname === child.key 
+                      ? darkMode 
+                        ? 'rgba(25, 25, 112, 0.4)'
+                        : 'rgba(25, 25, 112, 0.3)'
+                      : 'transparent',
+                    color: location.pathname === child.key
+                      ? '#191970'
+                      : darkMode ? '#ffffff' : '#666666',
+                    padding: '0',
+                      width: collapsed ? '44px' : 'auto',
+                      minWidth: collapsed ? '44px' : 'auto',
+                      maxWidth: collapsed ? '44px' : 'none',
+                      boxShadow: location.pathname === child.key && collapsed
+                        ? darkMode 
+                          ? '0 4px 12px rgba(0, 175, 238, 0.3)'
+                          : '0 4px 12px rgba(0, 175, 238, 0.2)'
+                        : 'none',
+                      overflow: 'hidden'
+                    }
+                  }))
+                }
               }
-            }))}
+              // Item normal (sem submenu)
+              return {
+                ...item,
+                label: collapsed ? '' : item.label,
+                style: {
+                  margin: collapsed ? '2px 0' : '4px 0',
+                  borderRadius: collapsed ? '10px' : '12px',
+                  height: collapsed ? '44px' : '48px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '500',
+                  fontSize: '15px',
+                  transition: 'all 0.3s ease',
+                  background: location.pathname === item.key 
+                    ? darkMode 
+                      ? 'rgba(25, 25, 112, 0.4)'
+                      : 'rgba(25, 25, 112, 0.3)'
+                    : 'transparent',
+                  color: location.pathname === item.key
+                    ? '#191970'
+                    : darkMode ? '#ffffff' : '#666666',
+                  padding: '0',
+                  width: collapsed ? '44px' : 'auto',
+                  minWidth: collapsed ? '44px' : 'auto',
+                  maxWidth: collapsed ? '44px' : 'none',
+                  boxShadow: location.pathname === item.key && collapsed
+                    ? darkMode 
+                      ? '0 4px 12px rgba(0, 175, 238, 0.3)'
+                      : '0 4px 12px rgba(0, 175, 238, 0.2)'
+                    : 'none',
+                  overflow: 'hidden'
+                }
+              }
+            })}
           />
         </div>
         </Sider>
@@ -353,31 +385,66 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
           style={{
             background: 'transparent',
             border: 'none',
-            padding: '16px 8px'
+            padding: '16px 8px',
+            fontSize: '15px'
           }}
-          items={menuItems.map(item => ({
-            ...item,
-            style: {
-              margin: '4px 0',
-              borderRadius: '12px',
-              height: '48px',
-              display: 'flex',
-              alignItems: 'center',
-              fontWeight: '500',
-              transition: 'all 0.3s ease',
-              background: location.pathname === item.key 
-                ? 'rgba(25, 25, 112, 0.6)'
-                : 'transparent',
-              color: darkMode ? '#ffffff' : '#ffffff',
-              padding: '12px 16px',
-              width: '100%',
-              minWidth: 'auto',
-              boxShadow: location.pathname === item.key 
-                ? (darkMode ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(255, 255, 255, 0.2)')
-                : 'none',
-              overflow: 'hidden'
+          items={menuItems.map(item => {
+            // Se tem children, é um submenu
+            if (item.children) {
+              return {
+                ...item,
+                children: item.children.map((child: any) => ({
+                  ...child,
+                  style: {
+                    margin: '4px 0',
+                    borderRadius: '12px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontWeight: '500',
+                    fontSize: '15px',
+                    transition: 'all 0.3s ease',
+                    background: location.pathname === child.key 
+                      ? 'rgba(25, 25, 112, 0.6)'
+                      : 'transparent',
+                    color: '#ffffff',
+                    padding: '12px 16px',
+                    width: '100%',
+                    minWidth: 'auto',
+                    boxShadow: location.pathname === child.key 
+                      ? '0 4px 12px rgba(255, 255, 255, 0.2)'
+                      : 'none',
+                    overflow: 'hidden'
+                  }
+                }))
+              }
             }
-          }))}
+            // Item normal
+            return {
+              ...item,
+              style: {
+                margin: '4px 0',
+                borderRadius: '12px',
+                height: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                fontWeight: '500',
+                fontSize: '15px',
+                transition: 'all 0.3s ease',
+                background: location.pathname === item.key 
+                  ? 'rgba(25, 25, 112, 0.6)'
+                  : 'transparent',
+                color: '#ffffff',
+                padding: '12px 16px',
+                width: '100%',
+                minWidth: 'auto',
+                boxShadow: location.pathname === item.key 
+                  ? '0 4px 12px rgba(255, 255, 255, 0.2)'
+                  : 'none',
+                overflow: 'hidden'
+              }
+            }
+          })}
         />
       </Drawer>
 

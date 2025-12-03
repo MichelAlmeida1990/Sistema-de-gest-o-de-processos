@@ -167,14 +167,65 @@ body {
 /* Botões com tema claro */
 .ant-btn-default {
   background-color: #ffffff !important;
-  border-color: #d1d5db !important;
-  color: #0f172a !important;
+  border-color: #20b2aa !important;
+  color: #20b2aa !important;
+  font-weight: 500 !important;
 }
 
 .ant-btn-default:hover {
-  background-color: #f8fafc !important;
-  border-color: #031f5f !important;
-  color: #0f172a !important;
+  background-color: #20b2aa !important;
+  border-color: #20b2aa !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3) !important;
+}
+
+/* Botões secundários - Verde azulado */
+.ant-btn-secondary {
+  background-color: #20b2aa !important;
+  border-color: #20b2aa !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.ant-btn-secondary:hover {
+  background-color: #1a9b94 !important;
+  border-color: #1a9b94 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(32, 178, 170, 0.4) !important;
+}
+
+/* Botões terciários - Laranja suave */
+.ant-btn-tertiary {
+  background-color: #ff8c42 !important;
+  border-color: #ff8c42 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.ant-btn-tertiary:hover {
+  background-color: #ff7a2e !important;
+  border-color: #ff7a2e !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4) !important;
+}
+
+/* Botões neutros - Cinza azulado */
+.ant-btn-neutral {
+  background-color: #6c7b95 !important;
+  border-color: #6c7b95 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.ant-btn-neutral:hover {
+  background-color: #5a6b7d !important;
+  border-color: #5a6b7d !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(108, 123, 149, 0.4) !important;
 }
 
 /* Estilos adicionais para melhorar contraste */

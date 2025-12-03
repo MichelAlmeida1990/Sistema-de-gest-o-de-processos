@@ -40,9 +40,9 @@ export const MobileCard: React.FC<MobileCardProps> = ({
         cursor: onClick ? 'pointer' : 'default',
         background: '#ffffff'
       }}
-      bodyStyle={{
+      styles={{ body: {
         padding: '16px'
-      }}
+      } }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
         {/* Icon */}

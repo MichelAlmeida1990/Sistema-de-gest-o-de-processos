@@ -44,7 +44,11 @@ class Settings(BaseModel):
         """URL de conexão com o banco."""
         if self.DATABASE_URL:
             return self.DATABASE_URL
-        # Para desenvolvimento/Render sem PostgreSQL, usar SQLite
+        # Para desenvolvimento, tentar usar SQLite se PostgreSQL não estiver disponível
+        if self.ENVIRONMENT == "development":
+            # Tentar SQLite primeiro para desenvolvimento local
+            return "sqlite:///./app_data.db"
+        # Para produção sem DATABASE_URL, usar SQLite
         if self.ENVIRONMENT == "production" and not self.DATABASE_URL:
             return "sqlite:///./app_data.db"
         return (
@@ -145,6 +149,16 @@ class Settings(BaseModel):
     TIMEZONE: str = "America/Sao_Paulo"
     DATE_FORMAT: str = "%d/%m/%Y"
     DATETIME_FORMAT: str = "%d/%m/%Y %H:%M:%S"
+
+    # ===========================================
+    # IA - HUGGING FACE
+    # ===========================================
+    HUGGINGFACE_API_TOKEN: Optional[str] = ""
+    HUGGINGFACE_MODE: str = "api"  # "api" ou "local"
+    HUGGINGFACE_MODEL: str = "distilbert-base-uncased"
+    HUGGINGFACE_LLM_MODEL: str = "gpt2"  # Modelo mais confiável e sempre disponível
+    AI_REQUEST_TIMEOUT: int = 60
+    AI_CACHE_ENABLED: bool = True
 
     # ===========================================
     # VALIDAÇÕES
@@ -297,6 +311,27 @@ class Settings(BaseModel):
             ),
             DATAJUD_ENABLED=os.getenv(
                 "DATAJUD_ENABLED", "true"
+            ).lower() == "true",
+
+            # API RD Station
+            RDSTATION_API_TOKEN=os.getenv("RDSTATION_API_TOKEN", ""),
+            RDSTATION_PUBLIC_TOKEN=os.getenv("RDSTATION_PUBLIC_TOKEN", ""),
+            RDSTATION_ENABLED=os.getenv(
+                "RDSTATION_ENABLED", "false"
+            ).lower() == "true",
+
+            # IA - Hugging Face
+            HUGGINGFACE_API_TOKEN=os.getenv("HUGGINGFACE_API_TOKEN", ""),
+            HUGGINGFACE_MODE=os.getenv("HUGGINGFACE_MODE", "api"),
+            HUGGINGFACE_MODEL=os.getenv(
+                "HUGGINGFACE_MODEL", "distilbert-base-uncased"
+            ),
+            HUGGINGFACE_LLM_MODEL=os.getenv(
+                "HUGGINGFACE_LLM_MODEL", "gpt2"
+            ),
+            AI_REQUEST_TIMEOUT=int(os.getenv("AI_REQUEST_TIMEOUT", "60")),
+            AI_CACHE_ENABLED=os.getenv(
+                "AI_CACHE_ENABLED", "true"
             ).lower() == "true",
         )
 

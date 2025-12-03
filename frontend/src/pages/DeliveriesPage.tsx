@@ -351,7 +351,7 @@ export const DeliveriesPage: React.FC = () => {
                 border: 'none',
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
               }}
-              bodyStyle={{ padding: '20px' }}
+              styles={{ body: { padding: '20px' } }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
@@ -466,7 +466,7 @@ export const DeliveriesPage: React.FC = () => {
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
           border: 'none'
         }}
-        bodyStyle={{ padding: '24px' }}
+        styles={{ body: { padding: '24px' } }}
       >
         <Table
           columns={columns}
