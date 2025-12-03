@@ -118,10 +118,29 @@ cp .env.example .env
 │   │   ├── store/          # Estado global
 │   │   └── types/          # Tipos TypeScript
 │   └── package.json        # Dependências Node
+├── docs/                   # Documentação
+│   ├── COMO_TESTAR_SISTEMA.md
+│   ├── CREDENCIAIS_ATUAIS.md
+│   ├── GUIA-FUNCIONALIDADES.md
+│   └── ... (ver docs/INDEX.md)
+├── scripts/                # Scripts de automação
 ├── docker-compose.yml      # Orquestração Docker
 ├── .env.example           # Exemplo de variáveis
 └── README.md              # Este arquivo
 ```
+
+## 📚 Documentação
+
+Toda a documentação está na pasta `docs/`:
+
+- **[Como Testar o Sistema](docs/COMO_TESTAR_SISTEMA.md)** - Guia completo de testes
+- **[Credenciais](docs/CREDENCIAIS_ATUAIS.md)** - Credenciais de acesso
+- **[Guia de Funcionalidades](docs/GUIA-FUNCIONALIDADES.md)** - Funcionalidades do sistema
+- **[Guia Hugging Face](docs/GUIA_HUGGINGFACE.md)** - Configuração de IA
+- **[Roadmap](docs/ROADMAP-MELHORIAS.md)** - Melhorias planejadas
+- **[Deploy](docs/)** - Guias de deploy (PythonAnywhere, Render, Netlify)
+
+Ver [docs/INDEX.md](docs/INDEX.md) para lista completa.
 
 ## 🔧 Comandos Úteis
 
