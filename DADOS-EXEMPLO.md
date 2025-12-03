@@ -171,3 +171,6 @@ python seed_precatorios.py
 
 **🎉 Dados prontos para visualização!**
 
+
+
+

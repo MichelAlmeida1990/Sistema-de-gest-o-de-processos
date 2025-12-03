@@ -42,6 +42,9 @@ class File(BaseModel):
     process_id = Column(ForeignKey("processes.id"), nullable=True)
     process = relationship("Process", foreign_keys=[process_id])
     
+    diagnosis_id = Column(ForeignKey("legal_diagnoses.id"), nullable=True)
+    diagnosis = relationship("LegalDiagnosis", foreign_keys=[diagnosis_id], back_populates="files")
+    
     uploaded_by_id = Column(ForeignKey("users.id"), nullable=False)
     uploaded_by = relationship("User", foreign_keys=[uploaded_by_id])
     

@@ -43,3 +43,5 @@ Write-Host ""
 # Aguardar jobs
 Wait-Job -Job $backendJob, $frontendJob
 
+
+

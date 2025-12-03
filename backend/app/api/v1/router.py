@@ -4,7 +4,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud, funnel, financial, dashboard, reports_export, rdstation, precatorios, indices_economicos
+from app.api.v1.endpoints import auth, users, processes, tasks, files, notifications, timeline, reports, websocket, admin, datajud, funnel, financial, dashboard, reports_export, rdstation, precatorios, indices_economicos, deadlines, ai_analysis, legal_diagnosis, jurisprudence
 
 # ===========================================
 # ROUTER PRINCIPAL
@@ -140,6 +140,34 @@ api_router.include_router(
     indices_economicos.router,
     prefix="/indices-economicos",
     tags=["Índices Econômicos"]
+)
+
+# Cálculo de Prazos Processuais
+api_router.include_router(
+    deadlines.router,
+    prefix="/deadlines",
+    tags=["Cálculo de Prazos"]
+)
+
+# Análise com IA (Hugging Face)
+api_router.include_router(
+    ai_analysis.router,
+    prefix="/ai",
+    tags=["Análise com IA"]
+)
+
+# Diagnóstico Jurídico
+api_router.include_router(
+    legal_diagnosis.router,
+    prefix="/legal-diagnosis",
+    tags=["Diagnóstico Jurídico"]
+)
+
+# Assistente de Jurisprudência
+api_router.include_router(
+    jurisprudence.router,
+    prefix="/jurisprudence",
+    tags=["Assistente de Jurisprudência"]
 )
 
 # Relatórios PDF - TEMPORARIAMENTE DESABILITADO

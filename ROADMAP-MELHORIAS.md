@@ -298,3 +298,6 @@ Para implementar qualquer item:
 
 **💡 Dica**: Comece pelas funcionalidades de Alta Prioridade para ter maior impacto rápido!
 
+
+
+

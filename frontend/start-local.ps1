@@ -30,3 +30,6 @@ Write-Host ""
 # Iniciar o servidor Vite
 npm run dev
 
+
+
+

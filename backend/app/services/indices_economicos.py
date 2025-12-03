@@ -339,3 +339,6 @@ class IndicesEconomicosService:
 # Instância global do serviço
 indices_economicos_service = IndicesEconomicosService()
 
+
+
+

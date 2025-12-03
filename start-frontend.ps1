@@ -39,3 +39,5 @@ Write-Host ""
 # Iniciar servidor de desenvolvimento
 npm run dev
 
+
+
